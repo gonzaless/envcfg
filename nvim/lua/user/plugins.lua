@@ -3,26 +3,41 @@ vim.cmd [[packadd packer.nvim]]
 return require('packer').startup(function(use)
     use 'wbthomason/packer.nvim'
 
-    -- Status line
-    use {'nvim-lualine/lualine.nvim', requires = 'kyazdani42/nvim-web-devicons' }
 
+    ---------------------------------------------------------------------------
     -- Color schemes
+    ---------------------------------------------------------------------------
     use 'morhetz/gruvbox'
     use 'sainnhe/gruvbox-material'
     use 'ajmwagar/vim-deus'
     use 'sainnhe/everforest'
     use 'sainnhe/sonokai'
 
-    -- Highlighting
+
+    ---------------------------------------------------------------------------
+    -- Text editing
+    ---------------------------------------------------------------------------
+    use 'preservim/nerdcommenter'
+
+
+    ---------------------------------------------------------------------------
+    -- Text rendering
+    ---------------------------------------------------------------------------
+    use 'lukas-reineke/indent-blankline.nvim'
     use { 'nvim-treesitter/nvim-treesitter', run = function()
         require('nvim-treesitter.install').update({ with_sync = true })
     end}
 
-    -- Text editing
-    use 'lukas-reineke/indent-blankline.nvim'
-    use 'preservim/nerdcommenter'
 
+    ---------------------------------------------------------------------------
+    -- Status line
+    ---------------------------------------------------------------------------
+    use {'nvim-lualine/lualine.nvim', requires = 'kyazdani42/nvim-web-devicons' }
+
+
+    ---------------------------------------------------------------------------
     -- Misc
+    ---------------------------------------------------------------------------
     use {'glepnir/dashboard-nvim', config = function()
         local leader = vim.g.mapleader
         local nvim_ver = vim.version()
