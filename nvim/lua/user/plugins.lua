@@ -9,18 +9,25 @@ return require('packer').startup(function(use)
     -- Color schemes
     use 'morhetz/gruvbox'
     use 'sainnhe/gruvbox-material'
-    use { "folke/tokyonight.nvim", commit = "8223c970677e4d88c9b6b6d81bda23daf11062bb" }
-	use "lunarvim/darkplus.nvim"
+    use 'ajmwagar/vim-deus'
+    use 'sainnhe/everforest'
+    use 'sainnhe/sonokai'
 
     -- Highlighting
-    use { 'nvim-treesitter/nvim-treesitter', run = 'TSUpdate' }
+    use { 'nvim-treesitter/nvim-treesitter', run = function()
+        require('nvim-treesitter.install').update({ with_sync = true })
+    end}
 
     -- Text editing
     use 'lukas-reineke/indent-blankline.nvim'
     use 'preservim/nerdcommenter'
 
-  -- Misc
+    -- Misc
     use {'glepnir/dashboard-nvim', config = function()
+        local leader = vim.g.mapleader
+        local nvim_ver = vim.version()
+        local nvim_ver_str = string.format('v%d.%d.%d', nvim_ver.major, nvim_ver.minor, nvim_ver.patch)
+
         local db = require('dashboard')
         db.default_banner = {
             '',
@@ -32,11 +39,12 @@ return require('packer').startup(function(use)
             ' ██║ ╚████║ ███████╗╚██████╔╝  ╚████╔╝  ██║ ██║ ╚═╝ ██║',
             ' ╚═╝  ╚═══╝ ╚══════╝ ╚═════╝    ╚═══╝   ╚═╝ ╚═╝     ╚═╝',
             '',
+            nvim_ver_str,
             '',
         }
         db.preview_file_height = 11
         db.preview_file_width = 70
-        local leader = vim.g.mapleader
+        
         db.custom_center = {
             {
                 icon = '  ',
@@ -75,13 +83,13 @@ return require('packer').startup(function(use)
                 shortcut = leader .. 'ht'
             },
         }
-        db.custom_footer = { '', '🎉 Hello footer' }
+        db.custom_footer = { '', os.date("%a %b %d, %Y %X") }
     end}
 
-  use { "folke/which-key.nvim", config = function()
-  require("which-key").setup {
+    use { "folke/which-key.nvim", config = function()
+        require("which-key").setup {
 
-  }
-  end}
+        }
+    end}
 end)
 
