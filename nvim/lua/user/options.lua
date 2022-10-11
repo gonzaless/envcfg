@@ -9,7 +9,6 @@ vim.opt.tabstop = 4                                       -- Tab stop each 4 cha
 
 
 -- Display
-vim.opt.cursorline = true                                 -- Highlight current line (underline by default)
 vim.opt.number = true                                     -- Line number
 vim.opt.showmatch = true                                  -- Matching brackets handling
 --vim.opt.title = true                                      -- Show file title

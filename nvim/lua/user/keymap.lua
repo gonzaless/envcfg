@@ -37,3 +37,6 @@ keymap('x', '<A-k>', ":move '<-2<CR>gv-gv", noremap_silent)   -- ??
 keymap('v', 'p', '_dP', noremap_silent)                       -- keep original clipboard content when pasting over selection
 
 
+-- Advanced Text Editing
+keymap('n', '<C-/>', [[:call nerdcommenter#Comment('n', 'toggle')<CR>]], noremap_silent)
+

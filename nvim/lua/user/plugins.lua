@@ -1,6 +1,43 @@
-vim.cmd [[packadd packer.nvim]]
+-- Bootstrap
+local bootstrap_packer = function()
+  local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+  if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
+    vim.fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+    vim.cmd [[packadd packer.nvim]]
+    return true
+  end
+  return false
+end
 
-return require('packer').startup(function(use)
+local packer_bootstrapped = bootstrap_packer()
+local packer_found, packer = pcall(require, "packer")
+if not packer_found then
+  vim.notify('Packer not found. Bootstrap failed')
+  return
+end
+
+
+-- Auto update on save
+vim.cmd([[
+  augroup packer_user_config
+    autocmd!
+    autocmd BufWritePost plugins.lua source <afile> | PackerSync
+  augroup end
+]])
+
+
+-- Initialization
+packer.init {
+  display = {
+    open_fn = function()
+      return require("packer.util").float { border = "rounded" }
+    end,
+  },
+}
+
+
+-- Plugins
+return packer.startup(function(use)
     use 'wbthomason/packer.nvim'
 
 
@@ -32,7 +69,48 @@ return require('packer').startup(function(use)
     ---------------------------------------------------------------------------
     -- Status line
     ---------------------------------------------------------------------------
-    use {'nvim-lualine/lualine.nvim', requires = 'kyazdani42/nvim-web-devicons' }
+    use {'nvim-lualine/lualine.nvim', requires = 'kyazdani42/nvim-web-devicons', config = function()
+        require('lualine').setup {
+            options = {
+                icons_enabled = true,
+                theme = 'auto',
+                component_separators = { left = '', right = ''},
+                section_separators = { left = '', right = ''},
+                disabled_filetypes = {
+                    statusline = {},
+                    winbar = {},
+                },
+                ignore_focus = {},
+                always_divide_middle = true,
+                globalstatus = false,
+                refresh = {
+                    statusline = 1000,
+                    tabline = 1000,
+                    winbar = 1000,
+                }
+            },
+            sections = {
+                lualine_a = {'mode'},
+                lualine_b = {'branch', 'diff', 'diagnostics'},
+                lualine_c = {'filename'},
+                lualine_x = {'encoding', 'fileformat', 'filetype'},
+                lualine_y = {'progress'},
+                lualine_z = {'location'}
+            },
+            inactive_sections = {
+                lualine_a = {},
+                lualine_b = {},
+                lualine_c = {'filename'},
+                lualine_x = {'location'},
+                lualine_y = {},
+                lualine_z = {}
+            },
+            tabline = {},
+            winbar = {},
+            inactive_winbar = {},
+            extensions = {}
+        }
+    end}
 
 
     ---------------------------------------------------------------------------
@@ -106,5 +184,11 @@ return require('packer').startup(function(use)
 
         }
     end}
+
+    -- Automatically set up your configuration after cloning packer.nvim
+    -- Put this at the end after all plugins
+    if packer_bootstrapped then
+        packer.sync()
+    end
 end)
 
