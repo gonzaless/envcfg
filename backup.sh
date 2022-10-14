@@ -5,19 +5,32 @@ repo_root=`git rev-parse --show-toplevel`
 # Copy changes
 echo Backing up current config into $repo_root
 
+
 echo ''
-echo Backing up zsh config ...
-zsh_root=${repo_root}/zsh
-mkdir -p ${zsh_root}
-cp ~/.zshrc ${zsh_root}/zshrc
+echo Backing alacrity config ...
+dst=${repo_root}/alacritty
+src=~/.config/alacritty
+mkdir -p ${dst}
+cp -r ${src}/* ${dst}/
 echo Done
+
 
 echo ''
 echo Backing nvim config ...
-nvim_root=${repo_root}/nvim
-mkdir -p ${nvim_root}
-cp ~/.config/nvim/init.lua ${nvim_root}/
-cp -r ~/.config/nvim/lua ${nvim_root}/
+dst=${repo_root}/nvim
+src=~/.config/nvim
+mkdir -p ${dst}
+cp ${src}/init.lua ${dst}/
+cp -r ${src}/lua ${dst}/
+echo Done
+
+
+echo ''
+echo Backing up zsh config ...
+dst=${repo_root}/zsh
+src=~
+mkdir -p ${dst}
+cp ${src}/.zshrc ${dst}/zshrc
 echo Done
 
 
