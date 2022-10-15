@@ -31,6 +31,7 @@ dst=${repo_root}/zsh
 src=~
 mkdir -p ${dst}
 cp ${src}/.zshrc ${dst}/zshrc
+cp ${src}/.p10k.zsh ${dst}/p10k.zsh
 echo Done
 
 
