@@ -1,38 +1,38 @@
 -- Bootstrap
 local bootstrap_packer = function()
-  local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
-  if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-    vim.fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
-    vim.cmd [[packadd packer.nvim]]
-    return true
-  end
-  return false
+    local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+    if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
+        vim.fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+        vim.cmd [[packadd packer.nvim]]
+        return true
+    end
+    return false
 end
 
 local packer_bootstrapped = bootstrap_packer()
 local packer_found, packer = pcall(require, "packer")
 if not packer_found then
-  vim.notify('Packer not found. Bootstrap failed')
-  return
+    vim.notify('Packer not found. Bootstrap failed')
+    return
 end
 
 
 -- Auto update on save
 vim.cmd([[
-  augroup packer_user_config
-    autocmd!
-    autocmd BufWritePost plugins.lua source <afile> | PackerSync
-  augroup end
+    augroup packer_user_config
+        autocmd!
+        autocmd BufWritePost plugins.lua source <afile> | PackerSync
+    augroup end
 ]])
 
 
 -- Initialization
 packer.init {
-  display = {
-    open_fn = function()
-      return require("packer.util").float { border = "rounded" }
-    end,
-  },
+    display = {
+        open_fn = function()
+            return require("packer.util").float { border = "rounded" }
+        end,
+    },
 }
 
 
@@ -52,6 +52,32 @@ return packer.startup(function(use)
 
 
     ---------------------------------------------------------------------------
+    -- Icons
+    ---------------------------------------------------------------------------
+    --use 'ryanoasis/vim-devicons'
+    use {'nvim-tree/nvim-web-devicons', config = function()
+        -- Can specify color or cterm_color instead of specifying both of them
+        -- DevIcon will be appended to `name`
+        --override = {
+            --zsh = {
+                --icon = "",
+                --color = "#428850",
+                --cterm_color = "65",
+                --name = "Zsh"
+            --}
+         --};
+
+         -- globally enable different highlight colors per icon (default to true)
+         -- if set to false all icons will have the default icon's color
+         color_icons = true;
+
+         -- globally enable default icons (default to false)
+         -- will get overriden by `get_icons` option
+         default = true;
+    end}
+
+
+    ---------------------------------------------------------------------------
     -- Text editing
     ---------------------------------------------------------------------------
     use 'preservim/nerdcommenter'
@@ -61,16 +87,46 @@ return packer.startup(function(use)
     -- Text rendering
     ---------------------------------------------------------------------------
     use 'lukas-reineke/indent-blankline.nvim'
-    use { 'nvim-treesitter/nvim-treesitter', run = function()
+    use {'nvim-treesitter/nvim-treesitter', run = function()
         require('nvim-treesitter.install').update({ with_sync = true })
+    end}
+
+
+    ---------------------------------------------------------------------------
+    -- Explorer
+    ---------------------------------------------------------------------------
+    use {'nvim-tree/nvim-tree.lua',
+        --tag = 'nightly',
+        requires = 'nvim-tree/nvim-web-devicons', -- optional, for file icons
+        --wants = 'nvim-web-devicons',
+        config = function() require('nvim-tree').setup {
+            sort_by = "case_sensitive",
+            view = {
+                adaptive_size = true,
+                mappings = {
+                    list = {
+                        { key = "u", action = "dir_up" },
+                    },
+                },
+            },
+            renderer = {
+                group_empty = true,
+            },
+            filters = {
+                dotfiles = true,
+            },
+        }
     end}
 
 
     ---------------------------------------------------------------------------
     -- Status line
     ---------------------------------------------------------------------------
-    use {'nvim-lualine/lualine.nvim', requires = 'kyazdani42/nvim-web-devicons', config = function()
-        require('lualine').setup {
+    use {'nvim-lualine/lualine.nvim',
+        requires = 'nvim-tree/nvim-web-devicons',
+        wants = 'nvim-web-devicons',
+
+        config = function() require('lualine').setup {
             options = {
                 icons_enabled = true,
                 theme = 'auto',

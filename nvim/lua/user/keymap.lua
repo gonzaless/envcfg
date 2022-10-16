@@ -11,12 +11,13 @@ local noremap_silent = { noremap = true, silent = true }
 keymap('n', '<leader>e', ':Lex 24<CR>', noremap_silent)
 
 
--- Panels
+-- Window Resize
 keymap('n', '<C-Up>', ':resize -2<CR>', noremap_silent)
 keymap('n', '<C-Down>', ':resize +2<CR>', noremap_silent)
 keymap('n', '<C-Left>', ':vertical resize -2<CR>', noremap_silent)
 keymap('n', '<C-Right>', ':vertical resize +2<CR>', noremap_silent)
 
+-- Windows Navigation
 keymap('n', '<C-h>', '<C-w>h', noremap_silent)
 keymap('n', '<C-j>', '<C-w>j', noremap_silent)
 keymap('n', '<C-k>', '<C-w>k', noremap_silent)
@@ -39,4 +40,11 @@ keymap('v', 'p', '_dP', noremap_silent)                       -- keep original c
 
 -- Advanced Text Editing
 keymap('n', '<C-/>', [[:call nerdcommenter#Comment('n', 'toggle')<CR>]], noremap_silent)
+
+
+-- File Explorer
+vim.g.loaded_netrw = 1           -- Disable netrw
+vim.g.loaded_netrwPlugin = 1     -- in favor of nvim-tree
+--keymap('n', '<Leader>t', ':NvimTreeFocus<CR>', noremap_silent)
+keymap('n', '<Leader>e', ':NvimTreeToggle<CR>', noremap_silent)
 
