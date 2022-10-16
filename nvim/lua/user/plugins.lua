@@ -100,12 +100,15 @@ return packer.startup(function(use)
         requires = 'nvim-tree/nvim-web-devicons', -- optional, for file icons
         --wants = 'nvim-web-devicons',
         config = function() require('nvim-tree').setup {
-            sort_by = "case_sensitive",
+            hijack_cursor = false,
+            sort_by = "case_insensitive",
             view = {
                 adaptive_size = true,
                 mappings = {
                     list = {
+                        { key = "h", action = "close_node" },
                         { key = "u", action = "dir_up" },
+                        { key = "v", action = "vsplit" },
                     },
                 },
             },
