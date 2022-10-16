@@ -25,6 +25,11 @@ vim.opt.scrolloff = 8                                     -- Vertical scroll off
 vim.opt.sidescrolloff = 8                                 -- Horizontal scroll offset in chars
 
 
+-- Explorer (disable in favor of nvim-tree
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+
 -- Search
 vim.opt.hlsearch = true                                   -- Highlight search
 vim.opt.ignorecase = true                                 -- Ignore case when searching

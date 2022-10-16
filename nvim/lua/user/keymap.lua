@@ -43,8 +43,6 @@ keymap('n', '<C-/>', [[:call nerdcommenter#Comment('n', 'toggle')<CR>]], noremap
 
 
 -- File Explorer
-vim.g.loaded_netrw = 1           -- Disable netrw
-vim.g.loaded_netrwPlugin = 1     -- in favor of nvim-tree
---keymap('n', '<Leader>t', ':NvimTreeFocus<CR>', noremap_silent)
 keymap('n', '<Leader>e', ':NvimTreeToggle<CR>', noremap_silent)
+--keymap('n', '<Leader>t', ':NvimTreeFocus<CR>', noremap_silent)
 

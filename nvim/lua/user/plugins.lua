@@ -55,25 +55,27 @@ return packer.startup(function(use)
     -- Icons
     ---------------------------------------------------------------------------
     --use 'ryanoasis/vim-devicons'
-    use {'nvim-tree/nvim-web-devicons', config = function()
-        -- Can specify color or cterm_color instead of specifying both of them
-        -- DevIcon will be appended to `name`
-        --override = {
-            --zsh = {
-                --icon = "",
-                --color = "#428850",
-                --cterm_color = "65",
-                --name = "Zsh"
-            --}
-         --};
+    use {'nvim-tree/nvim-web-devicons',
+        config = function() require('nvim-web-devicons').setup {
+            -- Can specify color or cterm_color instead of specifying both of them
+            -- DevIcon will be appended to `name`
+            --override = {
+                --zsh = {
+                    --icon = "",
+                    --color = "#428850",
+                    --cterm_color = "65",
+                    --name = "Zsh",
+                --}
+             --},
 
-         -- globally enable different highlight colors per icon (default to true)
-         -- if set to false all icons will have the default icon's color
-         color_icons = true;
+             -- globally enable different highlight colors per icon (default to true)
+             -- if set to false all icons will have the default icon's color
+             color_icons = true,
 
-         -- globally enable default icons (default to false)
-         -- will get overriden by `get_icons` option
-         default = true;
+             -- globally enable default icons (default to false)
+             -- will get overriden by `get_icons` option
+             default = true,
+         }
     end}
 
 
@@ -87,8 +89,53 @@ return packer.startup(function(use)
     -- Text rendering
     ---------------------------------------------------------------------------
     use 'lukas-reineke/indent-blankline.nvim'
+
     use {'nvim-treesitter/nvim-treesitter', run = function()
         require('nvim-treesitter.install').update({ with_sync = true })
+    end}
+
+
+    ---------------------------------------------------------------------------
+    -- LSP
+    ---------------------------------------------------------------------------
+    use 'neovim/nvim-lspconfig'
+
+    use {'williamboman/mason.nvim',
+        config = function() require('mason').setup {
+            max_concurrent_installers = 4,
+            ui = {
+                border = "none",
+                icons = {
+                    package_installed = "✓",
+                    package_pending = "➜",
+                    package_uninstalled = "✗",
+                },
+
+            },
+            keymaps = {
+                toggle_package_expand = "<CR>",         -- Expand a package
+                install_package = "i",                  -- Install the package under the current cursor position
+                update_package = "u",                   -- Keymap to reinstall/update the package under the current cursor position
+                check_package_version = "c",            -- Keymap to check for new version for the package under the current cursor position
+                update_all_packages = "U",              -- Keymap to update all installed packages
+                check_outdated_packages = "C",          -- Keymap to check which installed packages are outdated
+                uninstall_package = "X",                -- Keymap to uninstall a package
+                cancel_installation = "<C-c>",          -- Keymap to cancel a package installation
+                apply_language_filter = "<C-f>",        -- Keymap to apply language filter
+            },
+        }
+    end}
+
+    use {'williamboman/mason-lspconfig.nvim',
+        requires = {
+            'neovim/nvim-lspconfig',
+            'williamboman/mason.nvim',
+        },
+        config = function() require('mason-lspconfig').setup {
+            ensure_installed = {
+                'sumneko_lua',
+            }
+        }
     end}
 
 
