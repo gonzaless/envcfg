@@ -53,8 +53,8 @@ keymap('n', '<C-/>', [[:call nerdcommenter#Comment('n', 'toggle')<CR>]])
 
 
 -- LSP
---keymap('n', '<space>e', vim.diagnostic.open_float)
+--keymap('n', '<Leader>e', vim.diagnostic.open_float)
 --keymap('n', '[d', vim.diagnostic.goto_prev)
 --keymap('n', ']d', vim.diagnostic.goto_next)
---keymap('n', '<space>q', vim.diagnostic.setloclist)
+--keymap('n', '<Leader>q', vim.diagnostic.setloclist)
 
