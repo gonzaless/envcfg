@@ -3,6 +3,12 @@ if not lspconfig_found then
     return
 end
 
+local cmp_nvim_lsp_found, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
+if not cmp_nvim_lsp_found then
+    print('cmp_nvim_lsp module not found')
+    cmp_nvim_lsp = nil
+end
+
 local utils = require('user.utils')
 
 
@@ -16,8 +22,7 @@ local server_cfg_dir = 'servers'
 -- Utils
 -------------------------------------------------------------------------------
 local function on_attach(client, bufnr)
-    print('DEBUG: one_attach called ...')
-    local keymap = function(mode, lhs, rhs, opts)
+    local function keymap(mode, lhs, rhs, opts)
         if opts == nil then
             opts = { noremap = true, silent = true }
         end
@@ -26,7 +31,6 @@ local function on_attach(client, bufnr)
 
     -- Keymap
     keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
-    keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
     keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
     keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
     keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
@@ -44,10 +48,15 @@ local function on_attach(client, bufnr)
 
     -- Enable completion triggered by <C-x><C-O>
     vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-
-    print('DEBUG: one_attach done')
 end
+
+
+local cmp_capabilities = cmp_nvim_lsp ~= nil and cmp_nvim_lsp.default_capabilities() or {}
+
+local default_server_cfg = {
+    on_attach = on_attach,
+    capabilities = cmp_capabilities,
+}
 
 
 local function setup_server(server_name)
@@ -72,8 +81,13 @@ local function setup_server(server_name)
         return
     end
 
-    server_cfg.on_attach = on_attach
-    setup(server_cfg)
+    if server_cfg.on_attach ~= nil then
+        print(string.format('Warning: LSP server "%s" config defines "on_attach", it will be overwritten', server_name))
+        server_cfg.on_attach = nil
+    end
+
+    local merged_server_cfg = vim.tbl_deep_extend('force', default_server_cfg, server_cfg)
+    setup(merged_server_cfg)
 end
 
 
@@ -83,7 +97,6 @@ local function setup_all_servers()
 
     for _, server_cfg in ipairs(server_cfgs) do
         local server_name = server_cfg:match("(.+)%..+$")
-        print(server_cfg, ' -> ', server_name)
         setup_server(server_name)
     end
 end
