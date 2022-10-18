@@ -4,9 +4,19 @@ if not cmp_found or cmp == nil then
     return
 end
 
+local luasnip_found, luasnip = pcall(require, 'luasnip')
+if not luasnip_found or luasnip == nil then
+    print('luasnip not found')
+end
 
 cmp.setup {
-    --snippet = {},
+    snippet = {
+        expand = function(args)
+            if luasnip ~= nil then
+                luasnip.lsp_expand(args.body)
+            end
+        end
+    },
 
     --window = {
     -- completion = cmp.config.window.bordered(),
@@ -28,15 +38,20 @@ cmp.setup {
         ['<C-f>'] = cmp.mapping.scroll_docs(4),
         ['<C-Space>'] = cmp.mapping.complete(),
         ['<C-e>'] = cmp.mapping.abort(),
-        ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-        ["<Tab>"] = cmp.mapping(
+        ['<CR>'] = cmp.mapping.confirm{
+            behavior = cmp.ConfirmBehavior.Insert,
+            select = true, -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+        },
+        ['<Tab>'] = cmp.mapping(
             function(fallback)
                 if cmp.visible() then
                     cmp.select_next_item()
-                --elseif luasnip.expandable() then
-                    --luasnip.expand()
-                --elseif luasnip.expand_or_jumpable() then
-                    --luasnip.expand_or_jump()
+                elseif luasnip == nil then
+                    fallback()
+                elseif luasnip.expandable() then
+                    luasnip.expand()
+                elseif luasnip.expand_or_jumpable() then
+                    luasnip.expand_or_jump()
                 else
                     fallback()
                 end

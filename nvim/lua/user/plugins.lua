@@ -138,11 +138,22 @@ return packer.startup(function(use)
         }
     end}
 
+
+    ---------------------------------------------------------------------------
+    -- Completion
+    ---------------------------------------------------------------------------
     use 'hrsh7th/nvim-cmp'
     use 'hrsh7th/cmp-buffer'
     use 'hrsh7th/cmp-cmdline'
     use 'hrsh7th/cmp-path'
-    use 'hrsh7th/cmp-nvim-lsp'
+    use {'hrsh7th/cmp-nvim-lsp', requires = 'neovim/nvim-lspconfig'}
+
+
+    ---------------------------------------------------------------------------
+    -- Snippets
+    ---------------------------------------------------------------------------
+    use {'L3MON4D3/LuaSnip'}
+    use {'saadparwaiz1/cmp_luasnip', requires = { 'neovim/nvim-lspconfig', 'L3MON4D3/LuaSnip' }}
 
 
     ---------------------------------------------------------------------------
