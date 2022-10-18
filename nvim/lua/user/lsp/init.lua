@@ -17,10 +17,43 @@ local utils = require('user.utils')
 -------------------------------------------------------------------------------
 local server_cfg_dir = 'servers'
 
+local popup_border = 'none'  -- none single double rounded solid shadow
+
+local diagnostic_cfg = {
+    float = {
+        border = popup_border,
+        --focusable = false,
+        --header = '',
+        --prefix = '',
+        --style = 'minimal',
+    },
+    signs = true,
+    virtual_text = true,
+}
+
+local sign_overrides = {
+    { name = "DiagnosticSignError", sign = { text = "", texthl = 'DiagnosticError', --[[culhl = '', linehl = '', numhl = ''--]] } },
+    { name = "DiagnosticSignWarn" , sign = { text = "", texthl = 'DiagnosticWarn' } },
+    { name = "DiagnosticSignHint" , sign = { text = "", texthl = 'DiagnosticHint' } },
+    { name = "DiagnosticSignInfo" , sign = { text = "", texthl = 'DiagnosticInfo' } },
+}
+
 
 -------------------------------------------------------------------------------
 -- Utils
 -------------------------------------------------------------------------------
+local function configure_ui()
+    for _, override in ipairs(sign_overrides) do
+        vim.fn.sign_define(override.name, override.sign)
+    end
+
+    vim.diagnostic.config(diagnostic_cfg)
+
+    vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = popup_border })
+    vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = popup_border, })
+end
+
+
 local function on_attach(client, bufnr)
     local function keymap(mode, lhs, rhs, opts)
         if opts == nil then
@@ -106,4 +139,5 @@ end
 -- Initialization
 -------------------------------------------------------------------------------
 setup_all_servers()
+configure_ui()
 
