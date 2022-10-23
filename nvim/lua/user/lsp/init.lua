@@ -114,7 +114,12 @@ local function setup_server(server_name)
         return
     end
 
-    if server_cfg.on_attach ~= nil then
+    if type(server_cfg) ~= 'table' then
+        print(string.format('Failed to configure LSP server "%s" - server config doesn\'t return a table', server_name))
+        return
+    end
+
+    if server_cfg['on_attach'] ~= nil then
         print(string.format('Warning: LSP server "%s" config defines "on_attach", it will be overwritten', server_name))
         server_cfg.on_attach = nil
     end
