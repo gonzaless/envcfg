@@ -81,11 +81,14 @@ cmp.setup {
         format = function(entry, vim_item)
             vim_item.kind = string.format("%s", item_kind_to_icon[vim_item.kind])
             vim_item.menu = ({
-                nvim_lsp = "[LSP]",
-                nvim_lua = "[NVIM_LUA]",
-                luasnip = "[Snippet]",
-                buffer = "[Buffer]",
-                path = "[Path]",
+                buffer = '[Buffer]',
+                calc = '[Calc]',
+                luasnip = '[Snippet]',
+                nvim_lsp = '[LSP]',
+                nvim_lua = '[NVIM_LUA]',
+                path = '[Path]',
+                treesitter = '[Treesitter]',
+                zsh = '[Zsh]',
             })[entry.source.name]
             return vim_item
         end,
@@ -144,9 +147,9 @@ cmp.setup.cmdline({'/', '?' }, {
 cmp.setup.cmdline(':', {
     mapping = cmp.mapping.preset.cmdline(),
     sources = cmp.config.sources({
-        { name = 'path' }
-    }, {
         { name = 'cmdline' }
+    }, {
+        { name = 'path' }
     })
 })
 
