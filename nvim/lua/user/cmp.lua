@@ -9,6 +9,44 @@ if not luasnip_found or luasnip == nil then
     print('luasnip not found')
 end
 
+
+-------------------------------------------------------------------------------
+-- Configuration
+-------------------------------------------------------------------------------
+
+local item_kind_to_icon = {
+  Class = "",
+  Color = "",
+  Constant = "𝝿",
+  Constructor = "𝞁",
+  Enum = "𝝚",
+  EnumMember = "𝝴",
+  Event = "",
+  Field = "𝞅",
+  File = "",
+  Folder = "",
+  Function = "",
+  Interface = "",
+  Keyword = "",
+  Method = "𝝻",
+  Module = "",
+  Operator = "",
+  Property = "",
+  Reference = "",
+  Snippet = "",
+  Struct = "",
+  Text = "𝝩",
+  TypeParameter = "",
+  Unit = "",
+  Value = "𝝼",
+  Variable = "𝞌",
+}
+
+
+-------------------------------------------------------------------------------
+-- Setup
+-------------------------------------------------------------------------------
+
 cmp.setup {
     snippet = {
         expand = function(args)
@@ -33,6 +71,26 @@ cmp.setup {
         --border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
     --},
 
+    experimental = {
+        ghost_text = true,
+        --native_menu = false,
+    },
+
+    formatting = {
+        fields = { "kind", "abbr", "menu" },
+        format = function(entry, vim_item)
+            vim_item.kind = string.format("%s", item_kind_to_icon[vim_item.kind])
+            vim_item.menu = ({
+                nvim_lsp = "[LSP]",
+                nvim_lua = "[NVIM_LUA]",
+                luasnip = "[Snippet]",
+                buffer = "[Buffer]",
+                path = "[Path]",
+            })[entry.source.name]
+            return vim_item
+        end,
+    },
+
     mapping = cmp.mapping.preset.insert({
         ['<C-b>'] = cmp.mapping.scroll_docs(-4),
         ['<C-f>'] = cmp.mapping.scroll_docs(4),
@@ -46,15 +104,20 @@ cmp.setup {
             function(fallback)
                 if cmp.visible() then
                     cmp.select_next_item()
-                elseif luasnip == nil then
-                    fallback()
-                elseif luasnip.expandable() then
-                    luasnip.expand()
-                elseif luasnip.expand_or_jumpable() then
-                    luasnip.expand_or_jump()
-                else
-                    fallback()
+                    return
                 end
+
+                if luasnip ~= nil then
+                    if luasnip.expandable() then
+                        luasnip.expand()
+                        return
+                    elseif luasnip.expand_or_jumpable() then
+                        luasnip.expand_or_jump()
+                        return
+                    end
+                end
+
+                fallback()
             end,
             {'i', 's'}
         ),
@@ -62,10 +125,7 @@ cmp.setup {
 
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
-        --{ name = 'vsnip' }, -- For vsnip users.
-        -- { name = 'luasnip' }, -- For luasnip users.
-        -- { name = 'ultisnips' }, -- For ultisnips users.
-        -- { name = 'snippy' }, -- For snippy users.
+        -- { name = 'luasnip' },
     }, {
         { name = 'buffer' },
         { name = 'path' },
@@ -73,7 +133,7 @@ cmp.setup {
 }
 
 -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline({ '/', '?' }, {
+cmp.setup.cmdline({'/', '?' }, {
     mapping = cmp.mapping.preset.cmdline(),
     sources = {
         { name = 'buffer' }
