@@ -147,6 +147,7 @@ return packer.startup(function(use)
     use 'hrsh7th/cmp-cmdline'
     use 'hrsh7th/cmp-path'
     use {'hrsh7th/cmp-nvim-lsp', requires = 'neovim/nvim-lspconfig'}
+    use 'hrsh7th/cmp-nvim-lua'
 
 
     ---------------------------------------------------------------------------
@@ -184,6 +185,14 @@ return packer.startup(function(use)
             },
         }
     end}
+
+
+    ---------------------------------------------------------------------------
+    -- Search
+    ---------------------------------------------------------------------------
+    use {'nvim-telescope/telescope.nvim', tag = '0.1.0',
+        requires = { {'nvim-lua/plenary.nvim'} }
+    }
 
 
     ---------------------------------------------------------------------------

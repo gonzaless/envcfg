@@ -1,9 +1,10 @@
--- Leader Key
+-- Config
 local leader = ';'
 vim.g.mapleader = leader
 vim.g.maplocalleader = leader
 
--- Keymap
+
+-- Utils
 local keymap = function(mode, lhs, rhs, opts)
     if opts == nil then
         opts = { noremap = true, silent = true }
@@ -32,6 +33,13 @@ keymap('n', '<C-l>', '<C-w>l')
 -- File Explorer
 keymap('n', '<Leader>e', ':NvimTreeToggle<CR>')
 --keymap('n', '<Leader>t', ':NvimTreeFocus<CR>')
+
+
+-- Search
+keymap('n', '<leader>ff', '<cmd>Telescope find_files<cr>')
+keymap('n', '<leader>fg', '<cmd>Telescope live_grep<cr>')
+keymap('n', '<leader>fb', '<cmd>Telescope buffers<cr>')
+keymap('n', '<leader>fh', '<cmd>Telescope help_tags<cr>')
 
 
 -- Text Editing
