@@ -1,3 +1,6 @@
+-------------------------------------------------------------------------------
+-- Colorscheme
+-------------------------------------------------------------------------------
 local colorschemes = {
     'gruvbox',
     'everforest',
@@ -7,21 +10,25 @@ local colorschemes = {
 }
 
 for _,colorscheme in ipairs(colorschemes) do
-    local colorscheme_set, _ = pcall(vim.cmd, string.format('colorscheme %s', colorscheme))
+    local colorscheme_set, _ = pcall(vim.cmd.colorscheme, colorscheme)
     if colorscheme_set then
         break
     else
-        vim.notify(string.format('Colorscheme "%s" not found!', colorscheme))
+        vim.notify(string.format('Colorscheme "%s" not found', colorscheme), vim.log.levels.ERROR)
     end
 end
 
 
+-------------------------------------------------------------------------------
 -- General
+-------------------------------------------------------------------------------
 vim.opt.termguicolors = true                              -- Enable 24bit color if the terminal supports it
 vim.opt.cursorline = true                                 -- Highlight current line (underline by default)
 
 
+-------------------------------------------------------------------------------
 -- Whitespace Rendering
+-------------------------------------------------------------------------------
 vim.opt.list = true
 vim.opt.listchars:append "space:⋅"
 -- vim.opt.listchars:append "eol:↴"

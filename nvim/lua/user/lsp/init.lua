@@ -151,7 +151,7 @@ end
 
 local function setup_all_servers()
     local server_cfg_path = utils.script_path() .. '/' .. server_cfg_dir
-    local server_cfgs = utils.scandir(server_cfg_path)
+    local server_cfgs = utils.scan_dir(server_cfg_path)
 
     for _, server_cfg in ipairs(server_cfgs) do
         local server_name = server_cfg:match("(.+)%..+$")
