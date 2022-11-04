@@ -26,9 +26,9 @@ local plugin_module_pattern = require('user.utils').script_path() .. '*.lua'
 
 vim.api.nvim_create_autocmd(
     'BufWritePost',
-    { 
+    {
         pattern = plugin_module_pattern,
-        command = 'PackerSync', 
+        command = 'PackerSync',
     }
 )
 
