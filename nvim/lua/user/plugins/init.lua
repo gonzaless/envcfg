@@ -70,6 +70,7 @@ return packer.startup(function(use)
     setup_group('user.plugins.editor')
     setup_group('user.plugins.lsp')
     setup_group('user.plugins.cmp')
+    setup_group('user.plugins.version_control')
     setup_group('user.plugins.ui')
     setup_group('user.plugins.search')
 
