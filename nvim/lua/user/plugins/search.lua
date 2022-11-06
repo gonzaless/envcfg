@@ -7,7 +7,12 @@ M.setup = function (use)
         config = function ()
             local telescope_found, telescope = pcall(require, "telescope")
             if not telescope_found then
-              return
+                vim.notify('Telescope plugin is not found', vim.log.levels.ERROR)
+                return
+            end
+
+            if vim.fn.executable('rg') == 0 then
+                vim.notify('rg (ripgrep) is not installed, Telescope grep will be unavailable', vim.log.levels.WARN)
             end
 
             local actions = require "telescope.actions"
