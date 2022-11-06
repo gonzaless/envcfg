@@ -46,10 +46,10 @@ M.setup = function (use)
                     --numbers = "none" | "ordinal" | "buffer_id" | "both" | function({ ordinal, id, lower, raise }): string,
                      offsets = {
                         {
-                            filetype = "NvimTree",
-                            --text = "File Explorer" | function ,
-                            --text_align = "left" | "center" | "right"
-                            --separator = true
+                            filetype = 'NvimTree',
+                            text = 'פּ File Explorer',
+                            text_align = 'left',
+                            separator = ' ',
                         }
                     },
 
@@ -57,12 +57,12 @@ M.setup = function (use)
                     -----------------------------------------------------------
                     -- Tabs
                     -----------------------------------------------------------
-                    --color_icons = true | false, -- whether or not to add the filetype icon highlights
+                    color_icons = true, -- whether or not to add the filetype icon highlights
                     --show_buffer_icons = true | false, -- disable filetype icons for buffers
                     --show_buffer_close_icons = true | false,
                     --show_buffer_default_icon = true | false, -- whether or not an unrecognised filetype should show a default icon
                     --show_close_icon = true | false,
-                    --show_tab_indicators = true | false,
+                    show_tab_indicators = true,
                     --show_duplicate_prefix = true | false, -- whether to show duplicate buffer prefix
 
                     -- can also be a table containing 2 custom separators
@@ -76,10 +76,11 @@ M.setup = function (use)
                     --},
 
 
-                    --indicator = {
-                        --icon = '▎', -- this should be omitted if indicator style is not 'icon'
+                    indicator = {
+                        icon = '▎', -- this should be omitted if indicator style is not 'icon'
+                        style = 'icon',
                         --style = 'icon' | 'underline' | 'none',
-                    --},
+                    },
                     --buffer_close_icon = '',
                     --modified_icon = '●',
                     --close_icon = '',

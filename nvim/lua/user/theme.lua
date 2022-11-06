@@ -2,6 +2,7 @@
 -- Colorscheme
 -------------------------------------------------------------------------------
 local colorschemes = {
+    'gruvbox-material',
     'gruvbox',
     'everforest',
     'sonokai',
