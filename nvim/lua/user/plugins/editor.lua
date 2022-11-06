@@ -17,7 +17,6 @@ M.setup = function (use)
     ---------------------------------------------------------------------------
     -- Syntax Highlighting
     ---------------------------------------------------------------------------
---[[
     use {'nvim-treesitter/nvim-treesitter',
         run = function()
             require('nvim-treesitter.install').update {
@@ -25,7 +24,18 @@ M.setup = function (use)
             }
 
             require'nvim-treesitter.configs'.setup {
-                ensure_installed = { 'c', 'cmake', 'cpp', 'javascript', 'json', 'lua', 'python', 'rust' },
+                auto_install = false,  -- Automatically install missing parsers when entering buffer
+
+                ensure_installed = {
+                    'c',
+                    'cmake',
+                    'cpp',
+                    'javascript',
+                    'json',
+                    'lua',
+                    'python',
+                },
+
                 highlight = {
                     enable = true, -- `false` will disable the whole extension
 
@@ -46,13 +56,13 @@ M.setup = function (use)
                     -- Instead of true it can also be a list of languages
                     additional_vim_regex_highlighting = false,
                 },
+
                 indent = {
                     enabled = true,
                 },
             }
         end
     }
---]]
 end
 
 
