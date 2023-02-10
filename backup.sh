@@ -10,29 +10,41 @@ echo ''
 echo Backing alacrity config ...
 dst=${repo_root}/alacritty
 src=~/.config/alacritty
-mkdir -p ${dst}
-cp -r ${src}/* ${dst}/
-echo Done
+if [ ! -d "$src" ]; then
+  echo Skipping - failed to locate config directory $src
+else
+  mkdir -p "${dst}"
+  cp -r "${src}/*" "${dst}/"
+  echo Done
+fi
 
 
 echo ''
 echo Backing nvim config ...
 dst=${repo_root}/nvim
 src=~/.config/nvim
-mkdir -p ${dst}
-cp ${src}/init.lua ${dst}/
-cp -r ${src}/lua ${dst}/
-echo Done
+if [ ! -d "$src" ]; then
+  echo Skipping - failed to locate config directory $src
+else
+  mkdir -p "${dst}"
+  cp "${src}/init.lua" "${dst}/"
+  cp -r "${src}/lua" "${dst}/"
+  echo Done
+fi
 
 
 echo ''
 echo Backing up zsh config ...
 dst=${repo_root}/zsh
 src=~
-mkdir -p ${dst}
-cp ${src}/.zshrc ${dst}/zshrc
-cp ${src}/.p10k.zsh ${dst}/p10k.zsh
-echo Done
+if [ ! -d "$src" ]; then
+  echo Skipping - failed to locate config directory $src
+else
+  mkdir -p "${dst}"
+  cp "${src}/.zshrc" "${dst}/zshrc"
+  cp "${src}/.p10k.zsh" "${dst}/p10k.zsh"
+  echo Done
+fi
 
 
 # Show status
