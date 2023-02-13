@@ -16,12 +16,6 @@ print_help() {
 
 
 # Parse command line
-if [[ $# > 1 ]]; then
-  error "Single action needs to be specified"
-  print_help
-  exit 1
-fi
-
 action=backup
 
 while [[ $# > 0 ]]; do
@@ -31,6 +25,10 @@ while [[ $# > 0 ]]; do
             ;;
         -d|--deploy)
             action=deploy
+            shift
+            ;;
+        --git)
+            git=1
             shift
             ;;
         -h|--help)
@@ -163,13 +161,29 @@ sync_file      '.zshrc'
 cfg_sync_end
 
 
-# Show status
+# Git settings
+if [[ ! -z ${git+x} && $action = deploy ]]; then
+    cfg_sync_begin 'git'
+
+    if command -v nvim &> /dev/null; then
+        git config --global core.editor nvim
+    elif command -v vim &> /dev/null; then
+        git config --global core.editor vim
+    fi
+
+    cfg_sync_end
+fi
+
+
+# Backup status and prompt
+if [[ ! $action = backup ]]; then
+   exit 0
+fi
+
 echo ''
 echo Changes:
 git -C $repo_root status
 
-
-# Action prompt
 echo ''
 echo 'Choose action'
 while true; do
