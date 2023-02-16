@@ -6,7 +6,11 @@
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+if [[ -f $HOME/.p10k.zsh ]]; then
+    P10K_IS_AVAILABLE=1
 fi
 
 # If you come from bash you might have to change your $PATH.
@@ -16,7 +20,7 @@ fi
 export ZSH="${HOME}/.oh-my-zsh"
 
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+if [[ ${P10K_IS_AVAILABLE} = 1 ]]; then
     ZSH_THEME="powerlevel10k/powerlevel10k"
 else
     ZSH_THEME="agnoster"
@@ -87,6 +91,7 @@ ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     git
+    vi-mode
     zsh-autosuggestions
     zsh-syntax-highlighting
 )
@@ -129,11 +134,23 @@ typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION=''
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
+if command -v nvim &> /dev/null; then
+    PREFERRED_EDITOR='nvim'
+else
+    PREFERRED_EDITOR='vim'
+fi
+
+if [[ -z $PREFERRED_EDITOR ]]; then
+    export EDITOR=$PREFERRED_EDITOR
+fi
+
+#if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='nvim'
+#else
 #   export EDITOR='mvim'
-# fi
+#fi
+
+bindkey -v
 
 
 ###############################################################################
@@ -141,31 +158,12 @@ typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION=''
 ###############################################################################
 
 # ls aliases
-if command -v lsd &> /dev/null
-then
+if command -v lsd &> /dev/null; then
     alias ls='lsd'
     alias lt='lsd --tree'
+elif command -v tree &> /dev/null; then
+    alias lt='tree'
 else
-    >&2 echo "lsd could not be found"
-
-    if command -v tree &> /dev/null
-    then
-        alias lt='tree'
-    else
-        >&2 echo "tree could not be found"
-        alias lt='find . -not -path "*/.*" | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"'
-    fi
+    alias lt='find . -not -path "*/.*" | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"'
 fi
-
-
-###############################################################################
-# Splash Screen
-###############################################################################
-
-# Neofetch
-if command -v neofetch &> /dev/null
-then
-    neofetch
-fi
-
 
