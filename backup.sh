@@ -11,7 +11,11 @@ fatal_error() {
 }
 
 print_help() {
-    echo "Usage: ${0##*/} [--backup | --deploy | --help]"
+    echo "Usage: ${0##*/} [-b|--backup] [-d|--deploy [--install-missing]] [-h|--help] [packages ...]"
+}
+
+to_lower() {
+    echo "$@" | tr '[:upper:]' '[:lower:]'
 }
 
 
@@ -19,6 +23,8 @@ print_help() {
 # Parse command line
 #
 action=backup
+unset packages
+unhandled_packages=()
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -29,18 +35,23 @@ while [[ $# -gt 0 ]]; do
             action=deploy
             shift
             ;;
-        --install-missing)
-            install_missing=1
-            shift
-            ;;
         -h|--help)
             print_help
             exit 0
             ;;
-        *)
+        --install-missing)
+            install_missing=1
+            shift
+            ;;
+        -*)
             error "Unknown option $1"
             print_help
             exit 1
+            ;;
+        *)
+            packages=("$@")
+            unhandled_packages=("$@")
+            break
             ;;
     esac
 done
@@ -62,14 +73,22 @@ fi
 #
 # Utils
 #
-
 package() {
     if [[ $# -lt 3 ]]; then
         fatal_error "Invalid ${FUNCNAME[0]} arguments: $@"
     fi
 
     name=$1
+    name_lower_case=`to_lower $name`
     shift
+
+    if [[ -n ${packages[@]} ]]; then
+        if [[ " ${packages[*]} " =~ " ${name_lower_case} " ]]; then
+            unhandled_packages=(${unhandled_packages[@]/$name_lower_case})
+        else
+            return
+        fi
+    fi
 
     unset command
     unset install_cb
@@ -330,6 +349,14 @@ sync_zsh() {
 }
 
 package Zsh --command zsh --is-installed is_installed_zsh --install install_zsh --sync sync_zsh
+
+
+#
+# Unrecognized packages
+#
+if (( ${#unhandled_packages[@]} != 0 )); then
+    fatal_error "Some specified packages are unknown: ${unhandled_packages[@]}"
+fi
 
 
 #
