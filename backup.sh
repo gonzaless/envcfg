@@ -1,5 +1,4 @@
-#!/usr/bin/env sh
-
+#!/usr/bin/env bash
 
 error() {
     echo "$@" 1>&2
@@ -8,6 +7,10 @@ error() {
 fatal_error() {
     echo "$@" 1>&2
     exit 1
+}
+
+is_known_command() {
+    command -v $1 &> /dev/null
 }
 
 print_help() {
@@ -62,7 +65,7 @@ done
 #
 repo_root=`git rev-parse --show-toplevel`
 
-if command -v brew &> /dev/null; then
+if is_known_command brew; then
     package_manager=brew
 else
     package_manager=aptitude
@@ -130,7 +133,7 @@ package() {
     if [[ ! -z $install_cb ]]; then
         if [[ $action = deploy && $install_missing = 1 ]]; then
             is_installed_def() {
-                command -v $command &> /dev/null
+                is_known_command $command
             }
 
             if [[ -z $is_installed_cb ]]; then
@@ -138,7 +141,7 @@ package() {
             fi
 
             if $is_installed_cb; then
-                echo "├── Package is already installed"
+                echo "├── Package components are already installed"
                 echo "│   └ Skip"
             else
                 printf "├── Package is missing, install $name? (y/n): "
@@ -146,8 +149,11 @@ package() {
                 case $yn in
                     [Yy]*)
                         echo "├── Installing"
-                        $install_cb
-                        echo "│   └ Done"
+                        if $install_cb; then
+                            echo "│   └ Done"
+                        else
+                            echo "│   └ Failed"
+                        fi
                         ;;
                     *)
                         echo "├── Installation declined"
@@ -167,6 +173,18 @@ package() {
     fi
 
     echo "└ Done"
+}
+
+installing_package_component() {
+    echo "│   ├ $1 ..."
+}
+
+installing_package_component_done() {
+    echo "│   │ └ Done"
+}
+
+package_component_is_already_installed() {
+    echo "│   ├ $1 is already installed"
 }
 
 install_os_package() {
@@ -263,9 +281,9 @@ install_git() {
 
 sync_git() {
     if [[ $action = deploy ]]; then
-        if command -v nvim &> /dev/null; then
+        if is_known_command nvim; then
             git config --global core.editor nvim
-        elif command -v vim &> /dev/null; then
+        elif is_known_command vim; then
             git config --global core.editor vim
         fi
     fi
@@ -319,26 +337,83 @@ package Neovim --command nvim --install install_nvim --sync sync_nvim
 #
 # ZSH
 #
-is_installed_zsh() {
-    if command -v zsh &> /dev/null; then
-        if [[ -d ~/.oh-my-zsh ]]; then
-            return 0
-        fi
+zsh_custom_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
+zsh_custom_plugins=(
+    plugin:zsh-autosuggestions@https://github.com/zsh-users/zsh-autosuggestions
+    plugin:zsh-syntax-highlighting@https://github.com/zsh-users/zsh-syntax-highlighting.git
+
+    theme:powerlevel10k@https://github.com/romkatv/powerlevel10k.git
+)
+
+zsh_custom_plugin_info() {
+    if [[ $1 =~ ^(theme|plugin):(.+)@(.+)$ ]]; then
+        # type name http dest
+        local info=("${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" "${BASH_REMATCH[3]}" "${zsh_custom_dir}/${BASH_REMATCH[1]}s/"${BASH_REMATCH[2]})
+        echo "${info[@]}"
+    else
+        fatal_error "Failed to parse plugin declaration: $1"
     fi
-    return 1
+}
+
+is_zsh_installed() {
+    if ! is_known_command zsh; then
+        return 1
+    fi
+
+    if [[ ! -d ~/.oh-my-zsh ]]; then
+        return 1
+    fi
+
+    for custom_plugin in ${zsh_custom_plugins[@]}; do
+        local custom_plugin_info=(`zsh_custom_plugin_info $custom_plugin`)
+        local custom_plugin_dest=${custom_plugin_info[3]}
+
+        if [[ ! -d $custom_plugin_dest ]]; then
+            return 1
+        fi
+    done
+
+    return 0
 }
 
 install_zsh() {
-    if command -v zsh &> /dev/null; then
-        echo "│   ├ zsh is already installed"
+    if is_known_command zsh; then
+        package_component_is_already_installed 'zsh'
     else
         install_os_package zsh
     fi
  
     if [[ -d ~/.oh-my-zsh ]]; then
-        echo "│   ├ oh-my-zsh is already installed"
+        package_component_is_already_installed 'oh-my-zsh'
     else
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    fi
+
+    if ! is_known_command git; then
+        error "Unable to install ZSH plugings - 'git' is not found"
+        return 1
+    fi
+
+    for custom_plugin in ${zsh_custom_plugins[@]}; do
+        local custom_plugin_info=(`zsh_custom_plugin_info $custom_plugin`)
+        local custom_plugin_type=${custom_plugin_info[0]}
+        local custom_plugin_name=${custom_plugin_info[1]}
+        local custom_plugin_http=${custom_plugin_info[2]}
+        local custom_plugin_dest=${custom_plugin_info[3]}
+
+        if [[ -d $custom_plugin_dest ]]; then
+            package_component_is_already_installed "$custom_plugin_name $custom_plugin_type"
+            continue
+        fi
+
+        installing_package_component "$custom_plugin_name $custom_plugin_type"
+        git clone --depth=1 "${custom_plugin_http}" "${custom_plugin_dest}"
+        installing_package_component_done
+    done
+
+    if [[ -n $ZSH_VERSION ]]; then
+        source ${HOME}/.zshrc
     fi
 }
 
@@ -348,7 +423,7 @@ sync_zsh() {
     sync_item '.p10k.zsh'
 }
 
-package Zsh --command zsh --is-installed is_installed_zsh --install install_zsh --sync sync_zsh
+package Zsh --command zsh --is-installed is_zsh_installed --install install_zsh --sync sync_zsh
 
 
 #
