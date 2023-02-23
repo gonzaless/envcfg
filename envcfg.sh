@@ -140,11 +140,18 @@ package() {
         is_installed_cb=is_installed_def
     fi
 
-    if $is_installed_cb; then
-        local status='installed'
-    else
-        local status='not found'
-    fi
+    $is_installed_cb
+    case $? in
+        0)
+            local status='installed'
+            ;;
+        2)
+            local status='unknown (unable to check)'
+            ;;
+        *)
+            local status='not found'
+            ;;
+    esac
 
     echo ""
     echo "┌ $name"
@@ -215,6 +222,10 @@ installing_package_component() {
 
 installing_package_component_done() {
     echo "│   │ └ Done"
+}
+
+installing_package_component_step() {
+    echo "│   │ ├ $1"
 }
 
 package_component_is_already_installed() {
@@ -332,6 +343,85 @@ sync_item() {
 # Perform action
 #
 echo "Performing '$action' with config repo '$repo_root'"
+
+
+#
+# Fonts
+#
+nerd_fonts_download=https://github.com/ryanoasis/nerd-fonts/releases/download
+
+fonts=(
+    $nerd_fonts_download/v3.1.1/3270.zip:3270NerdFontMono-Regular.ttf
+)
+
+is_fonts_installed() {
+    # Don't try to detect
+    return 2
+}
+
+install_fonts() {
+    if ! is_known_command wget; then
+        error "Unable to install fonts: 'wget' is missing"
+    fi
+    if ! is_known_command unzip; then
+        fatal_error "Unable to install fonts: 'unzip' is missing"
+    fi
+
+    if [[ $OSTYPE == "darwin"* ]]; then
+        local fonts_install_dir="$HOME/Library/Fonts"
+    elif [[ $OSTYPE == "linux-gnu"* ]]; then
+        local fonts_install_dir="$HOME/.fonts"
+    else
+        error "Unable to install font $1 - unsupported platform"
+    fi
+    local temp_dir=`mktemp -d`
+
+    for font_info in ${fonts[@]}; do
+        local font_url="${font_info%:*}"
+        local font_ttf="${font_info##*:}"
+        local font_archive_filename="${font_url##*/}"
+        local font_archive_download=$temp_dir/$font_archive_filename
+
+        local font_name=${font_archive_filename%%.*}
+        local font_unpacked_dir="${font_archive_download}-unpacked"
+
+        installing_package_component "Font $font_name"
+        installing_package_component_step "Downloading from $font_url"
+        wget --quiet --directory-prefix="$temp_dir" "$font_url"
+        if [[ ! -f $font_archive_download ]]; then
+            error "Failed to locate downloaded font archive: $font_archive_download"
+            continue
+        fi
+
+        installing_package_component_step "Unpacking into $font_unpacked_dir"
+        unzip -q "$font_archive_download" -d "$font_unpacked_dir"
+
+        if [[ $OSTYPE == "darwin"* ]]; then
+            installing_package_component_step "Moving $font_ttf -> $fonts_install_dir"
+            mv $font_unpacked_dir/$font_ttf $fonts_install_dir
+        elif [[ $OSTYPE == "linux-gnu"* ]]; then
+            local ttf_install_dir="$fonts_install_dir/truetype/$font_name"
+            installing_package_component_step "Moving $font_ttf -> $ttf_install_dir"
+            mkdir -p $ttf_install_dir
+            rm $ttf_install_dir/*.ttf
+            mv $font_unpacked_dir/$font_ttf $ttf_install_dir/
+        else
+            error "Unable to install font $1 - unsupported platform"
+        fi
+
+        installing_package_component_done
+    done
+
+    if [[ $OSTYPE == "linux-gnu"* ]]; then
+        installing_package_component "Rebuilding font info cache"
+        fc-cache -f $fonts_install_dir
+        installing_package_component_done
+    fi
+
+    rm -rf "$temp_dir"
+}
+
+package Fonts --is-installed is_fonts_installed --install install_fonts
 
 
 #
