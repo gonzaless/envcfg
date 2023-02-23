@@ -286,6 +286,7 @@ sync_git() {
         elif is_known_command vim; then
             git config --global core.editor vim
         fi
+        git config --global pager.branch false
     fi
 }
 
