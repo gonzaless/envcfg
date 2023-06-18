@@ -294,6 +294,16 @@ package Git --command git --install install_git --sync sync_git
 
 
 #
+# Curl
+#
+install_curl() {
+    install_os_package curl
+}
+
+package Curl --command curl --install install_curl
+
+
+#
 # Alacritty
 #
 install_alacritty() {
