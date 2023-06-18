@@ -252,14 +252,14 @@ sync_item() {
  
     printf "│   ├ $src -> $dst "
     if [[ -d $src ]]; then
-        printf "..."
+        printf '...'
         rsync -ah --delete "${src}/" "${dst}/" && printf "\b\b\b- Done\n"
     elif [[ -f $src ]]; then
-        printf "..."
+        printf '...'
         mkdir -p "${dst_root}"
         cp "${src}" "${dst}" && printf "\b\b\b- Done\n"
     else
-        printf "- source doesn't exist, skipping"
+        printf '- source doesn'\''t exist, skipping'
     fi
 
 }
