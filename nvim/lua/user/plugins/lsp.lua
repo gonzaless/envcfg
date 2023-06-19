@@ -3,12 +3,6 @@ local M = {}
 
 M.setup = function (use)
     ---------------------------------------------------------------------------
-    -- LSP
-    ---------------------------------------------------------------------------
-    use 'neovim/nvim-lspconfig'
-
-
-    ---------------------------------------------------------------------------
     -- LSP Server Management
     ---------------------------------------------------------------------------
     use {'williamboman/mason.nvim',
@@ -41,7 +35,6 @@ M.setup = function (use)
 
     use {'williamboman/mason-lspconfig.nvim',
         requires = {
-            'neovim/nvim-lspconfig',
             'williamboman/mason.nvim',
         },
         config = function()
@@ -51,6 +44,17 @@ M.setup = function (use)
                 }
             }
         end
+    }
+
+
+    ---------------------------------------------------------------------------
+    -- LSP
+    ---------------------------------------------------------------------------
+    use {'neovim/nvim-lspconfig',
+        requires = {
+            'williamboman/mason.nvim',
+            'williamboman/mason-lspconfig.nvim',
+        },
     }
 end
 
