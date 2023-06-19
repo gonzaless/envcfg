@@ -2,6 +2,7 @@
 
 error() {
     echo "$@" 1>&2
+    return 1
 }
 
 fatal_error() {
@@ -70,7 +71,6 @@ if is_known_command brew; then
 else
     package_manager=aptitude
 fi
-
 
 
 #
@@ -149,11 +149,18 @@ package() {
                 case $yn in
                     [Yy]*)
                         echo "├── Installing"
-                        if $install_cb; then
-                            echo "│   └ Done"
-                        else
-                            echo "│   └ Failed"
-                        fi
+                        $install_cb
+                        case $? in
+                            0)
+                                echo "│   └ Done"
+                                ;;
+                            2)
+                                echo "│   └ Unsupported for this platform"
+                                ;;
+                            *)
+                                echo "│   └ Failed"
+                                ;;
+                        esac
                         ;;
                     *)
                         echo "├── Installation declined"
@@ -187,22 +194,51 @@ package_component_is_already_installed() {
     echo "│   ├ $1 is already installed"
 }
 
-install_os_package() {
-    if [[ ! $# = 1 ]]; then
+install_os_package_command() {
+    if [[ ! $# = 2 ]]; then
         fatal_error "Invalid ${FUNCNAME[0]} arguments: $@"
     fi
 
-    case $package_manager in
+    case $2 in
         aptitude)
-            sudo apt install $1
+            echo sudo apt install $1
             ;;
         brew)
-            brew install $1
+            echo brew install $1
             ;;
         *)
-            error "Unknown package manager $package_manager"
+            ;;
     esac
 }
+
+install_os_package() {
+    if [[ $# = 0 ]]; then
+        fatal_error "Invalid ${FUNCNAME[0]} arguments: $@"
+    fi
+
+    unset install_command
+
+    for package_full_name in "$@"; do
+        local package="${package_full_name%%@*}"
+        local manager=$([[ $package == $package_full_name ]] && echo "$package_manager" || echo "${package_full_name#*@}")
+
+        local maybe_install_command=$(install_os_package_command "$package" "$manager")
+        if [[ -z "$maybe_install_command" ]]; then
+            fatal_error "Function ${FUNCNAME[0]} is called with unknown package manager '$manager', all arguments: $@"
+        fi
+
+        if [[ -z "$manager" || "$manager" == "$package_manager" ]]; then
+            install_command=${maybe_install_command}
+        fi
+    done
+
+    if [[ -z "$install_command" ]]; then
+        return 2  # no known version for this platform
+    else
+        eval ${install_command}
+    fi
+}
+
 
 sync_root() {
     config_dir=${1/#\~/$HOME}
@@ -291,6 +327,17 @@ sync_git() {
 }
 
 package Git --command git --install install_git --sync sync_git
+
+
+#
+# Ninja
+#
+install_ninja() {
+    install_os_package ninja-build@aptitude ninja@brew
+}
+
+package Ninja --command ninja --install install_ninja
+
 
 #
 # Ripgrep
