@@ -330,6 +330,26 @@ package Git --command git --install install_git --sync sync_git
 
 
 #
+# Curl
+#
+install_curl() {
+    install_os_package curl
+}
+
+package Curl --command curl --install install_curl
+
+
+#
+# CMake
+#
+install_cmake() {
+    install_os_package cmake
+}
+
+package CMake --command cmake --install install_cmake
+
+
+#
 # Ninja
 #
 install_ninja() {
@@ -347,16 +367,6 @@ install_ripgrep() {
 }
 
 package Ripgrep --command rg --install install_ripgrep
-
-
-#
-# Curl
-#
-install_curl() {
-    install_os_package curl
-}
-
-package Curl --command curl --install install_curl
 
 
 #
