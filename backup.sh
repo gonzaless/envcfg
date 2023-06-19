@@ -292,6 +292,15 @@ sync_git() {
 
 package Git --command git --install install_git --sync sync_git
 
+#
+# Ripgrep
+#
+install_ripgrep() {
+    install_os_package ripgrep
+}
+
+package Ripgrep --command rg --install install_ripgrep
+
 
 #
 # Curl
