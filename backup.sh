@@ -64,7 +64,7 @@ done
 #
 # Environment
 #
-repo_root=`git rev-parse --show-toplevel`
+repo_root=$( cd -- "$( dirname -- "$0" )" &> /dev/null && pwd )
 
 if is_known_command brew; then
     package_manager=brew
