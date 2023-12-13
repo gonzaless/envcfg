@@ -15,7 +15,7 @@ is_known_command() {
 }
 
 print_help() {
-    echo "Usage: ${0##*/} [-b|--backup] [-d|--deploy [--install-missing]] [-h|--help] [packages ...]"
+    echo "Usage: ${0##*/} [-b|--backup] [-d|--deploy [--install-missing]] [-h|--help] [-s|--status] [packages ...]"
 }
 
 to_lower() {
@@ -45,6 +45,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --install-missing)
             install_missing=1
+            shift
+            ;;
+        -s|--status)
+            action=status
             shift
             ;;
         -*)
@@ -127,18 +131,25 @@ package() {
         esac
     done
 
+    is_installed_def() {
+        is_known_command $command
+    }
+    if [[ -z $is_installed_cb ]]; then
+        is_installed_cb=is_installed_def
+    fi
+    
+    if $is_installed_cb; then
+        local is_installed_status_str='installed'
+    else
+        local is_installed_status_str='not found'
+    fi
+
     echo ""
-    echo "┌ Package $name ..."
+    echo "┌ $name"
+    echo "├── Status: $is_installed_status_str"
 
     if [[ ! -z $install_cb ]]; then
         if [[ $action = deploy && $install_missing = 1 ]]; then
-            is_installed_def() {
-                is_known_command $command
-            }
-
-            if [[ -z $is_installed_cb ]]; then
-                is_installed_cb=is_installed_def
-            fi
 
             if $is_installed_cb; then
                 echo "├── Package components are already installed"
@@ -285,7 +296,7 @@ sync_item() {
         src=$src_root/$1
         dst=$dst_root/$1
     fi
- 
+
     printf "│   ├ $src -> $dst "
     if [[ -d $src ]]; then
         printf '...'
@@ -304,8 +315,7 @@ sync_item() {
 #
 # Perform action
 #
-echo "Performing $action ..."
-echo "Config repo: $repo_root"
+echo "Performing '$action' with config repo '$repo_root'"
 
 
 #
