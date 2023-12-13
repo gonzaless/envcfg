@@ -544,6 +544,12 @@ if [[ ! $action = backup ]]; then
    exit 0
 fi
 
+if ! is_known_command git ; then
+    echo ''
+    echo 'Unable to show backup diff - git is not installed'
+    exit 0
+fi
+
 echo ''
 echo Changes:
 git -C $repo_root status
