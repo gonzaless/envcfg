@@ -489,8 +489,11 @@ install_zsh() {
  
     if [[ -d ~/.oh-my-zsh ]]; then
         package_component_is_already_installed 'oh-my-zsh'
-    else
+    elif is_known_command curl; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    else
+        error "Unable to install Oh My Zsh - curl is not found"
+        return 1
     fi
 
     if ! is_known_command git; then
