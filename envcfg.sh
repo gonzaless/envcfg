@@ -135,59 +135,74 @@ package() {
     is_installed_def() {
         is_known_command $command
     }
+
     if [[ -z $is_installed_cb ]]; then
         is_installed_cb=is_installed_def
     fi
-    
+
     if $is_installed_cb; then
-        local is_installed_status_str='installed'
+        local status='installed'
     else
-        local is_installed_status_str='not found'
+        local status='not found'
     fi
 
     echo ""
     echo "┌ $name"
-    echo "├── Status: $is_installed_status_str"
+    echo "├── Status: $status"
 
-    if [[ ! -z $install_cb ]]; then
-        if [[ $action = deploy && $install_missing = 1 ]]; then
-
-            if $is_installed_cb; then
-                echo "├── Package components are already installed"
-                echo "│   └ Skip"
-            else
-                printf "├── Package is missing, install $name? (y/n): "
-                read yn
-                case $yn in
-                    [Yy]*)
-                        echo "├── Installing"
-                        $install_cb
-                        case $? in
-                            0)
-                                echo "│   └ Done"
-                                ;;
-                            2)
-                                echo "│   └ Unsupported for this platform"
-                                ;;
-                            *)
-                                echo "│   └ Failed"
-                                ;;
-                        esac
-                        ;;
-                    *)
-                        echo "├── Installation declined"
-                        echo "│   └ Skip"
-                        ;;
-                esac
-            fi
+    # Installation
+    if [[ $action = deploy && $install_missing = 1 ]]; then
+        echo "├── Installation"
+        if [[ $status == installed ]]; then
+            echo "│   └ Skipped (already installed)"
+        elif [[ -z $install_cb ]]; then
+            echo "│   └ Skipped (undefined routine)"
+        else
+            printf "│   ├ Install $name? (y/n): "
+            read yn
+            case $yn in
+                [Yy]*)
+                    $install_cb
+                    case $? in
+                        0)
+                            echo "│   └ Done"
+                            status='installed'
+                            ;;
+                        2)
+                            echo "│   └ Unsupported for this platform"
+                            ;;
+                        *)
+                            echo "│   └ Failed"
+                            ;;
+                    esac
+                    ;;
+                *)
+                    echo "│   └ Declined"
+                    ;;
+            esac
         fi
     fi
 
-    if [[ ! -z $sync_cb ]]; then
-        if [[ $action = deploy || $action = backup ]]; then
-            echo "├── Synchronizing"
+    # Synchronization
+    if [[ $action == deploy || $action == backup ]]; then
+        echo "├── Synchronization"
+        if [[ -z $sync_cb ]]; then
+            echo "│   └ Skipped (not required/undefined)"
+        elif [[ $status != installed ]]; then
+            echo "│   └ Skipped (package is not found)"
+        else
             $sync_cb
-            echo "│   └ Done"
+            case $? in
+                0)
+                    echo "│   └ Done"
+                    ;;
+                2)
+                    echo "│   └ Unsupported for this platform"
+                    ;;
+                *)
+                    echo "│   └ Failed"
+                    ;;
+            esac
         fi
     fi
 
