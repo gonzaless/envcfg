@@ -26,13 +26,14 @@ to_lower() {
 #
 # Parse command line
 #
-action=backup
+action=status
 unset packages
 unhandled_packages=()
 
 while [[ $# -gt 0 ]]; do
     case $1 in
         -b|--backup)
+            action=backup
             shift
             ;;
         -d|--deploy)
