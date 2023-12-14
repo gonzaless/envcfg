@@ -280,7 +280,7 @@ install_os_package() {
             fatal_error "Function ${FUNCNAME[0]} is called with unknown package manager '$manager', all arguments: $@"
         fi
 
-        if [[ is_package_manager_found "$manager" ]]; then
+        if is_package_manager_found "$manager"; then
             install_command=${maybe_install_command}
         fi
     done
