@@ -273,14 +273,14 @@ install_os_package() {
 
     for package_full_name in "$@"; do
         local package="${package_full_name%%@*}"
-        local manager=$([[ $package == $package_full_name ]] && echo "$package_manager" || echo "${package_full_name#*@}")
+        local manager=$([[ $package == $package_full_name ]] && echo "${package_managers[0]}" || echo "${package_full_name#*@}")
 
         local maybe_install_command=$(install_os_package_command "$package" "$manager")
         if [[ -z "$maybe_install_command" ]]; then
             fatal_error "Function ${FUNCNAME[0]} is called with unknown package manager '$manager', all arguments: $@"
         fi
 
-        if [[ -z "$manager" || "$manager" == "$package_manager" ]]; then
+        if [[ is_package_manager_found "$manager" ]]; then
             install_command=${maybe_install_command}
         fi
     done
