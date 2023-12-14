@@ -119,7 +119,7 @@ font:
     #   - (macOS) Menlo
     #   - (Linux/BSD) monospace
     #   - (Windows) Consolas
-    family: 3270Medium Nerd Font Mono
+    family: 3270 Nerd Font Mono
     #family: Hack Nerd Font Mono
     #family: Inconsolata Nerd Font Mono
     #family: Lekton Nerd Font Mono
