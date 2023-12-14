@@ -504,7 +504,6 @@ package Ripgrep --command rg --install install_ripgrep
 # Alacritty
 #
 install_alacritty() {
-    # snap priority over aptitude
     install_os_package alacritty@brew alacritty@snap alacritty@aptitude
 }
 
@@ -531,7 +530,7 @@ package Neofetch --command neofetch --sync sync_neofetch
 # Neovim
 #
 install_nvim() {
-    install_os_package neovim@brew neovim@snap neovim@aptitude
+    install_os_package neovim@brew nvim@snap neovim@aptitude
 }
 
 sync_nvim() {
