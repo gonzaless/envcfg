@@ -282,6 +282,7 @@ install_os_package() {
 
         if is_package_manager_found "$manager"; then
             install_command=${maybe_install_command}
+            break
         fi
     done
 
