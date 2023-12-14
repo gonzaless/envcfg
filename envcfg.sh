@@ -71,11 +71,23 @@ done
 #
 repo_root=$( cd -- "$( dirname -- "$0" )" &> /dev/null && pwd )
 
-if is_known_command brew; then
-    package_manager=brew
-else
-    package_manager=aptitude
-fi
+found_package_managers=()
+known_package_managers=("aptitude@apt-get" "brew" "snap")
+
+find_package_managers() {
+    for package_manager_info in ${known_package_managers[@]}; do
+        local package_manager=${package_manager_info%@*}
+        local package_manager_command=${package_manager_info#*@}
+        if is_known_command $package_manager_command; then
+            found_package_managers+=($package_manager)
+        fi
+    done
+}
+find_package_managers
+
+is_package_manager_found() {
+    [[ " ${found_package_managers[@]} " =~ " $1 " ]]
+}
 
 
 #
@@ -243,6 +255,9 @@ install_os_package_command() {
             ;;
         brew)
             echo brew install $1
+            ;;
+        snap)
+            echo sudo snap install $1 --classic
             ;;
         *)
             ;;
@@ -489,7 +504,8 @@ package Ripgrep --command rg --install install_ripgrep
 # Alacritty
 #
 install_alacritty() {
-    install_os_package alacritty
+    # snap priority over aptitude
+    install_os_package alacritty@brew alacritty@snap alacritty@aptitude
 }
 
 sync_alacritty() {
@@ -515,7 +531,7 @@ package Neofetch --command neofetch --sync sync_neofetch
 # Neovim
 #
 install_nvim() {
-    install_os_package neovim
+    install_os_package neovim@brew neovim@snap neovim@aptitude
 }
 
 sync_nvim() {
