@@ -208,7 +208,7 @@ package() {
         if [[ -z $sync_cb ]]; then
             echo "│   └ Skipped (not required/undefined)"
         elif [[ $status != installed ]]; then
-            echo "│   └ Skipped (package is not found)"
+            echo "│   └ Skipped (package or its component is not found)"
         else
             $sync_cb
             case $? in
@@ -301,7 +301,7 @@ sync_root() {
             backup_dir=${repo_root}/${1##*/}
             ;;
         2)
-            backup_dir=$2
+            backup_dir=${repo_root}/${2}
             ;;
         *)
             fatal_error "Invalid ${FUNCNAME[0]} argument number $#"
