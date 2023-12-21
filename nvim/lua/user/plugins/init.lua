@@ -22,7 +22,8 @@ end
 -------------------------------------------------------------------------------
 -- Auto update on save
 -------------------------------------------------------------------------------
-local plugin_module_pattern = require('user.utils').script_path() .. '*.lua'
+local utils = require('user.utils')
+local plugin_module_pattern = utils.join_path(utils.current_script_dir(), '*.lua')
 
 vim.api.nvim_create_autocmd(
     'BufWritePost',

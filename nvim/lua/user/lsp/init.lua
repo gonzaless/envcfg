@@ -150,7 +150,7 @@ end
 
 
 local function setup_all_servers()
-    local server_cfg_path = utils.script_path() .. '/' .. server_cfg_dir
+    local server_cfg_path = utils.join_path(utils.current_script_dir(), server_cfg_dir)
     local server_cfgs = utils.scan_dir(server_cfg_path)
 
     for _, server_cfg in ipairs(server_cfgs) do
