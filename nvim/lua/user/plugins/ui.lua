@@ -228,7 +228,7 @@ M.setup = function (use)
         config = function ()
             require('nvim-tree').setup {
                 hijack_cursor = false,
-                sort_by = "case_insensitive",
+                sort_by = "name",
 
                 filters = {
                     dotfiles = true,
