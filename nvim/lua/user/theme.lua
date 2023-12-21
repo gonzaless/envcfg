@@ -35,11 +35,12 @@ vim.opt.listchars:append "space:⋅"
 -- vim.opt.listchars:append "eol:↴"
 --vim.api.nvim_set_hl(0, 'Whitespace', {ctermfg=8})
 
-local indent_blankline_found, indent_blankline = pcall(require, 'indent_blankline')
+local indent_blankline_found, indent_blankline = pcall(require, 'ibl')
 if indent_blankline_found and indent_blankline ~= nil then
-    indent_blankline.setup {
-        show_end_of_line = true,
-        space_char_blankline = ' ',
-    }
+    indent_blankline.setup()
+    --indent_blankline.setup {
+        --show_end_of_line = true,
+        --space_char_blankline = ' ',
+    --}
 end
 
