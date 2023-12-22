@@ -1,9 +1,3 @@
--- Config
-local leader = ';'
-vim.g.mapleader = leader
-vim.g.maplocalleader = leader
-
-
 -- Utils
 local keymap = function(mode, lhs, rhs, opts)
     if opts == nil then

@@ -16,6 +16,12 @@ vim.opt.showmatch = true                                  -- Matching brackets h
 vim.opt.wrap = false                                      -- display lines as one long line
 
 
+-- Keyboard
+local leader_key = ';'
+vim.g.mapleader = leader_key
+vim.g.maplocalleader = leader_key
+
+
 -- Mouse
 vim.opt.mouse = 'a'                                       -- Enable mouse
 
@@ -25,7 +31,7 @@ vim.opt.scrolloff = 8                                     -- Vertical scroll off
 vim.opt.sidescrolloff = 8                                 -- Horizontal scroll offset in chars
 
 
--- Explorer (disable in favor of nvim-tree
+-- Explorer (disable in favor of nvim-tree)
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
