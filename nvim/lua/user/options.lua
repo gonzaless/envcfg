@@ -2,18 +2,20 @@
 vim.opt.clipboard = 'unnamedplus'                         -- Use system clipboard
 
 
+-- Display
+vim.opt.cursorline = true                                 -- Highlight current line (underline by default)
+vim.opt.number = true                                     -- Line number
+vim.opt.showmatch = true                                  -- Matching brackets handling
+vim.opt.termguicolors = true                              -- Enable 24bit color if the terminal supports it
+--vim.opt.title = true                                      -- Show file title
+--vim.opt.wildmenu = true                                   -- Show advanced menu
+vim.opt.wrap = false                                      -- display lines as one long line
+
+
 -- Editing
 vim.opt.expandtab = true                                  -- Convert tabs to spaces
 vim.opt.shiftwidth = 4                                    -- Indentation length
 vim.opt.tabstop = 4                                       -- Tab stop each 4 chars (max tab expansion length)
-
-
--- Display
-vim.opt.number = true                                     -- Line number
-vim.opt.showmatch = true                                  -- Matching brackets handling
---vim.opt.title = true                                      -- Show file title
---vim.opt.wildmenu = true                                   -- Show advanced menu
-vim.opt.wrap = false                                      -- display lines as one long line
 
 
 -- Keyboard
@@ -43,3 +45,11 @@ vim.opt.ignorecase = true                                 -- Ignore case when se
 
 -- Spellchecking
 vim.cmd("command Spell setlocal spell! spelllang=en_us")  -- Enable spell checking, vim.opt.assumed language
+
+
+-- Whitespace Rendering
+vim.opt.list = true
+vim.opt.listchars:append "space:⋅"
+-- vim.opt.listchars:append "eol:↴"
+--vim.api.nvim_set_hl(0, 'Whitespace', {ctermfg=8})
+
