@@ -1,15 +1,10 @@
-local M = {}
-
-
-M.setup = function (use)
-    use {'nvim-telescope/telescope.nvim', tag = '0.1.0',
-        requires = { {'nvim-lua/plenary.nvim'} },
+return {
+    {
+        'nvim-telescope/telescope.nvim',
+        version = '0.1.4',
+        dependencies = { 'nvim-lua/plenary.nvim' },
         config = function ()
-            local telescope_found, telescope = pcall(require, "telescope")
-            if not telescope_found then
-                vim.notify('Telescope plugin is not found', vim.log.levels.ERROR)
-                return
-            end
+            local telescope = require "telescope"
 
             if vim.fn.executable('rg') == 0 then
                 vim.notify('rg (ripgrep) is not installed, Telescope grep will be unavailable', vim.log.levels.WARN)
@@ -85,9 +80,7 @@ M.setup = function (use)
                     },
                 },
             }
-        end
-    }
-end
+        end,
+    },
+}
 
-
-return M

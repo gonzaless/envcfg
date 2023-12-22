@@ -1,29 +1,28 @@
-local M = {}
-
-
-M.setup = function (use)
+return {
     ---------------------------------------------------------------------------
     -- Text Editing
     ---------------------------------------------------------------------------
-    use 'preservim/nerdcommenter'
+    {
+        'preservim/nerdcommenter',
+    },
 
 
     ---------------------------------------------------------------------------
     -- Text Rendering
     ---------------------------------------------------------------------------
-    use 'lukas-reineke/indent-blankline.nvim'
+    {
+        'lukas-reineke/indent-blankline.nvim',
+    },
 
 
     ---------------------------------------------------------------------------
     -- Syntax Highlighting
     ---------------------------------------------------------------------------
-    use {'nvim-treesitter/nvim-treesitter',
-        run = function()
-            require('nvim-treesitter.install').update {
-                with_sync = true
-            }
-
-            require'nvim-treesitter.configs'.setup {
+    {
+        'nvim-treesitter/nvim-treesitter',
+        build = ":TSUpdate",
+        config = function()
+            require ('nvim-treesitter.configs').setup {
                 auto_install = false,  -- Automatically install missing parsers when entering buffer
 
                 ensure_installed = {
@@ -61,9 +60,7 @@ M.setup = function (use)
                     enabled = true,
                 },
             }
-        end
-    }
-end
+        end,
+    },
+}
 
-
-return M

@@ -1,21 +1,14 @@
-local M = {}
-
-
-M.setup = function (use)
+return {
     ---------------------------------------------------------------------------
     -- Completion
     ---------------------------------------------------------------------------
-    use {'hrsh7th/nvim-cmp',
+    {
+        'hrsh7th/nvim-cmp',
         config = function ()
-            local cmp_found, cmp = pcall(require, 'cmp')
-            if not cmp_found or cmp == nil then
-                print('cmp not found')
-                return
-            end
-
-            local luasnip_found, luasnip = pcall(require, 'luasnip')
-            if not luasnip_found or luasnip == nil then
-                print('luasnip not found')
+            local cmp = require('cmp')
+            local _, luasnip = pcall(require, 'luasnip')
+            if luasnip == nil then
+                vim.notify('luasnip is missing and will not be integrated with cmp', vim.log.levels.WARN)
             end
 
             local item_kind_to_icon = {
@@ -165,24 +158,25 @@ M.setup = function (use)
                 })
             })
         end
-    }
-    use 'hrsh7th/cmp-buffer'
-    use 'hrsh7th/cmp-cmdline'
-    use 'hrsh7th/cmp-path'
-    use {'hrsh7th/cmp-nvim-lsp',
-        requires = 'neovim/nvim-lspconfig'
-    }
-    use 'hrsh7th/cmp-nvim-lua'
+    },
+
+    'hrsh7th/cmp-buffer',
+    'hrsh7th/cmp-cmdline',
+    'hrsh7th/cmp-path',
+    {
+        'hrsh7th/cmp-nvim-lsp',
+        dependencies = { 'neovim/nvim-lspconfig', },
+    },
+    'hrsh7th/cmp-nvim-lua',
 
 
     ---------------------------------------------------------------------------
     -- Snippets
     ---------------------------------------------------------------------------
-    use 'L3MON4D3/LuaSnip'
-    use{'saadparwaiz1/cmp_luasnip',
-        requires = { 'neovim/nvim-lspconfig', 'L3MON4D3/LuaSnip' }
-    }
-end
+    'L3MON4D3/LuaSnip',
+    {
+        'saadparwaiz1/cmp_luasnip',
+        dependencies = { 'neovim/nvim-lspconfig', 'L3MON4D3/LuaSnip' },
+    },
+}
 
-
-return M
