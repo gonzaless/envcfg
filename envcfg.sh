@@ -472,6 +472,40 @@ package Curl --command curl --install install_curl
 
 
 #
+# Conda
+#
+install_conda() {
+    if is_package_manager_found 'brew'; then
+        install_os_package miniconda@brew
+    elif [[ $OSTYPE == "linux-gnu"* ]]; then
+        local conda_prefix="$HOME/Sandbox/conda"
+        local conda_bootstrap_dst="$conda_prefix/miniconda_bootstrap.sh"
+        local conda_bootstrap_url="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+
+        installing_package_component "Creating conda directory $conda_prefix"
+        mkdir -p "$conda_prefix"
+        installing_package_component_done
+
+        installing_package_component "Downloading conda boostrap script  $conda_bootstrap_url -> $conda_bootstrap_dst"
+        wget "$conda_bootstrap_url" -O "$conda_bootstrap_dst"
+        installing_package_component_done
+
+        installing_package_component "Running conda boostrap script $conda_bootstrap_dst, target directory $conda_prefix"
+        bash "$conda_bootstrap_dst" -b -u -p "$conda_prefix"
+        installing_package_component_done
+
+        installing_package_component "Removing conda boostrap scrip $conda_bootstrap_dst"
+        rm "$conda_bootstrap_dst"
+        installing_package_component_done
+    else
+        error "Unable to install miniconda - unsupported platform"
+    fi
+}
+
+package Conda --command conda --install install_conda
+
+
+#
 # CMake
 #
 install_cmake() {
