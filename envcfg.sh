@@ -584,6 +584,16 @@ package Neovim --command nvim --install install_nvim --sync sync_nvim
 
 
 #
+# Tmux
+#
+install_tmux() {
+    install_os_package tmux
+}
+
+package Tmux --command tmux --install install_tmux
+
+
+#
 # ZSH
 #
 zsh_custom_dir="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
