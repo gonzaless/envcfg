@@ -559,6 +559,24 @@ package Fd --command fd-find --install install_fd
 
 
 #
+# Fzf
+#
+install_fzf() {
+    if ! is_known_command git; then
+        error "Unable to install fzf - 'git' is not found"
+        return 1
+    fi
+
+    local fzf_url="https://github.com/junegunn/fzf.git"
+    local fzf_dst="$HOME/.fzf"
+    git clone --depth 1 "$fzf_url" "$fzf_dst"
+    $fzf_dst/install
+}
+
+package Fzf --command fzf --install install_fzf
+
+
+#
 # HTop
 #
 install_htop() {
