@@ -582,7 +582,7 @@ package Ripgrep --command rg --install install_ripgrep
 # Alacritty
 #
 install_alacritty() {
-    install_os_package alacritty@brew alacritty@snap alacritty@aptitude
+    install_os_package alacritty
 }
 
 sync_alacritty() {
