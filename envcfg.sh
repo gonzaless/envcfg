@@ -357,7 +357,7 @@ sync_item() {
         mkdir -p "${dst_root}"
         cp "${src}" "${dst}" && printf "\b\b\b- Done\n"
     else
-        printf '- source doesn'\''t exist, skipping'
+        printf -- "- source does not exist, skipping\n"
     fi
 
 }
@@ -645,7 +645,12 @@ install_tmux() {
     install_os_package tmux
 }
 
-package Tmux --command tmux --install install_tmux
+sync_tmux() {
+    sync_root '~' 'tmux'
+    sync_item '.tmux.conf'
+}
+
+package Tmux --command tmux --install install_tmux --sync sync_tmux
 
 
 #
