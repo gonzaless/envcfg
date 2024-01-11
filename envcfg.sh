@@ -10,10 +10,6 @@ fatal_error() {
     exit 1
 }
 
-is_known_command() {
-    command -v $1 &> /dev/null
-}
-
 print_help() {
     echo "Usage: ${0##*/} [-b|--backup] [-d|--deploy [--install-missing]] [-h|--help] [-s|--status] [packages ...]"
 }
@@ -69,6 +65,14 @@ done
 #
 # Environment
 #
+is_in_path() {
+    [[ ":$PATH:" == *":$1:"* ]]
+}
+
+is_known_command() {
+    command -v $1 &> /dev/null
+}
+
 repo_root=$( cd -- "$( dirname -- "$0" )" &> /dev/null && pwd )
 
 found_package_managers=()
@@ -532,7 +536,30 @@ package Ninja --command ninja --install install_ninja
 
 
 #
-# htop
+# Fd
+#
+install_fd() {
+    install_os_package fd-find@aptitude fd@brew
+
+    if is_known_command fd; then
+        return 0
+    fi
+    if is_known_command fdfind; then
+        local user_local_bin="$HOME/.local/bin"
+        mkdir -p $user_local_bin
+        ln -s "$(which fdfind)" "$user_local_bin/fd"
+
+        if ! is_in_path "$user_local_bin"; then
+            installing_package_comment "WARNING: $user_local_bin is not in PATH, ~/.profile may add it automatically upon restart - verify or add manually"
+        fi
+    fi
+}
+
+package Fd --command fd-find --install install_fd
+
+
+#
+# HTop
 #
 install_htop() {
     install_os_package htop
