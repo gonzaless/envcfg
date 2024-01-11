@@ -746,6 +746,12 @@ if ! is_known_command git ; then
     exit 0
 fi
 
+if git diff --quiet; then
+    echo ''
+    echo 'No changes detected'
+    exit 0
+fi
+
 echo ''
 echo Changes:
 git -C $repo_root status
@@ -753,7 +759,7 @@ git -C $repo_root status
 echo ''
 echo 'Choose action'
 while true; do
-    read -p 'Commit [c], Diff [d], Reset [r]: ' choice
+    read -p 'Commit [c], Diff [d], Exit [e], Reset [r]: ' choice
     case "$choice" in 
         c|C ) 
             now=`date -u +'%Y-%m-%d %H:%M:%S'`
@@ -763,6 +769,9 @@ while true; do
             ;;
         d|D )
             git -C $repo_root diff
+            ;;
+        e|E )
+            break
             ;;
         r|R )
             git -C $repo_root reset --hard
