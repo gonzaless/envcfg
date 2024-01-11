@@ -532,6 +532,16 @@ package Ninja --command ninja --install install_ninja
 
 
 #
+# htop
+#
+install_htop() {
+    install_os_package htop
+}
+
+package HTop --command htop --install install_htop
+
+
+#
 # Ripgrep
 #
 install_ripgrep() {
