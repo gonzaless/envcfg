@@ -102,8 +102,8 @@ package() {
         fatal_error "Invalid ${FUNCNAME[0]} arguments: $@"
     fi
 
-    name=$1
-    name_lower_case=`to_lower $name`
+    local name=$1
+    local name_lower_case=`to_lower $name`
     shift
 
     if [[ -n ${packages[@]} ]]; then
@@ -114,36 +114,30 @@ package() {
         fi
     fi
 
-    unset command_str
-    unset comment_str
-    unset install_cb
-    unset is_installed_cb
-    unset sync_cb
-
     while [[ $# -gt 0 ]]; do
         case $1 in
             --command)
-                command_str=$2
+                local command_str=$2
                 shift
                 shift
                 ;;
             --comment)
-                comment_str=$2
+                local comment_str=$2
                 shift
                 shift
                 ;;
             --install)
-                install_cb=$2
+                local install_cb=$2
                 shift
                 shift
                 ;;
             --is-installed)
-                is_installed_cb=$2
+                local is_installed_cb=$2
                 shift
                 shift
                 ;;
             --sync)
-                sync_cb=$2
+                local sync_cb=$2
                 shift
                 shift
                 ;;
@@ -176,7 +170,7 @@ package() {
     esac
 
     echo ""
-    if [ -z "$comment_str" ]; then
+    if [[ -z $comment_str ]]; then
         echo "┌ $name"
     else
         echo "┌ $name ($comment_str)"
@@ -294,7 +288,7 @@ install_os_package() {
         local manager=$([[ $package == $package_full_name ]] && echo "${found_package_managers[0]}" || echo "${package_full_name#*@}")
 
         local maybe_install_command=$(install_os_package_command "$package" "$manager")
-        if [[ -z "$maybe_install_command" ]]; then
+        if [[ -z $maybe_install_command ]]; then
             fatal_error "Function ${FUNCNAME[0]} is called with unknown package manager '$manager', all arguments: $@"
         fi
 
@@ -304,7 +298,7 @@ install_os_package() {
         fi
     done
 
-    if [[ -z "$install_command" ]]; then
+    if [[ -z $install_command ]]; then
         return 2  # no known version for this platform
     else
         eval ${install_command}
