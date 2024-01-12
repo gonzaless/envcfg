@@ -114,7 +114,8 @@ package() {
         fi
     fi
 
-    unset command
+    unset command_str
+    unset comment_str
     unset install_cb
     unset is_installed_cb
     unset sync_cb
@@ -122,7 +123,12 @@ package() {
     while [[ $# -gt 0 ]]; do
         case $1 in
             --command)
-                command=$2
+                command_str=$2
+                shift
+                shift
+                ;;
+            --comment)
+                comment_str=$2
                 shift
                 shift
                 ;;
@@ -149,7 +155,7 @@ package() {
     done
 
     is_installed_def() {
-        is_known_command $command
+        is_known_command $command_str
     }
 
     if [[ -z $is_installed_cb ]]; then
@@ -170,7 +176,11 @@ package() {
     esac
 
     echo ""
-    echo "┌ $name"
+    if [ -z "$comment_str" ]; then
+        echo "┌ $name"
+    else
+        echo "┌ $name ($comment_str)"
+    fi
     echo "├── Status: $status"
 
     # Installation
@@ -445,7 +455,7 @@ install_fonts() {
     rm -rf "$temp_dir"
 }
 
-package Fonts --is-installed is_fonts_installed --install install_fonts
+package Fonts --comment 'Custom fonts tailored for modern terminals' --is-installed is_fonts_installed --install install_fonts
 
 
 #
@@ -512,7 +522,7 @@ install_conda() {
     fi
 }
 
-package Conda --command conda --install install_conda
+package Conda --comment 'Miniconda package manager' --command conda --install install_conda
 
 
 #
@@ -555,7 +565,7 @@ install_fd() {
     fi
 }
 
-package Fd --command fd-find --install install_fd
+package Fd --comment 'Modern alternative to "find"' --command fd-find --install install_fd
 
 
 #
@@ -573,7 +583,7 @@ install_fzf() {
     $fzf_dst/install
 }
 
-package Fzf --command fzf --install install_fzf
+package Fzf --comment 'General-purpose command-line fuzzy finder' --command fzf --install install_fzf
 
 
 #
@@ -593,7 +603,7 @@ install_ripgrep() {
     install_os_package ripgrep
 }
 
-package Ripgrep --command rg --install install_ripgrep
+package Ripgrep --comment 'Modern alternative to "grep"' --command rg --install install_ripgrep
 
 
 #
@@ -608,7 +618,7 @@ sync_alacritty() {
     sync_item .
 }
 
-package Alacritty --command alacritty --install install_alacritty --sync sync_alacritty
+package Alacritty --comment 'terminal emulator' --command alacritty --install install_alacritty --sync sync_alacritty
 
 
 #
