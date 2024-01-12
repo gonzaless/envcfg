@@ -597,6 +597,16 @@ package Ripgrep --command rg --install install_ripgrep
 
 
 #
+# SSHD
+#
+install_sshd() {
+    install_os_package sshd
+}
+
+package sshd --command sshd --install install_sshd
+
+
+#
 # Alacritty
 #
 install_alacritty() {
