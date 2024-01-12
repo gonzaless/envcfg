@@ -601,6 +601,16 @@ package Ripgrep --comment 'Modern alternative to "grep"' --command rg --install 
 
 
 #
+# SSHD
+#
+install_sshd() {
+    install_os_package openssh-server@aptitude
+}
+
+package SSHD --comment 'SSH server - minimal Ubuntu Desktop does not include it' --command sshd --install install_sshd
+
+
+#
 # Alacritty
 #
 install_alacritty() {
