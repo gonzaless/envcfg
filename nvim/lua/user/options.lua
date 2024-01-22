@@ -49,7 +49,7 @@ vim.cmd("command Spell setlocal spell! spelllang=en_us")  -- Enable spell checki
 
 -- Whitespace Rendering
 vim.opt.list = true
-vim.opt.listchars:append "space:⋅"
+vim.opt.listchars:append "space:·"
 -- vim.opt.listchars:append "eol:↴"
 --vim.api.nvim_set_hl(0, 'Whitespace', {ctermfg=8})
 
