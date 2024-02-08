@@ -65,6 +65,18 @@ done
 #
 # Environment
 #
+if [[ $OSTYPE == "darwin"* ]]; then
+    os_type='darwin'
+    os_name='macos'
+    os_version=$( sw_vers --ProductVersion )
+elif [[ $OSTYPE == "linux-gnu"* ]]; then
+    os_type='linux'
+    os_name=$( cat /etc/os-release | awk -F= '$1=="ID"{print $2}' | tr -d '"' )
+    os_version=$( cat /etc/os-release | awk -F= '$1=="VERSION_ID"{print $2}' | tr -d '"' )
+else
+    fatal_error "Unsupported platform"
+fi
+
 is_in_path() {
     [[ ":$PATH:" == *":$1:"* ]]
 }
@@ -371,6 +383,7 @@ sync_item() {
 # Perform action
 #
 echo "Performing '$action' with config repo '$repo_root'"
+echo "OS type='$os_type' name='$os_name' version='$os_version'"
 
 
 #
@@ -395,9 +408,9 @@ install_fonts() {
         fatal_error "Unable to install fonts: 'unzip' is missing"
     fi
 
-    if [[ $OSTYPE == "darwin"* ]]; then
+    if [[ $os_type == "darwin" ]]; then
         local fonts_install_dir="$HOME/Library/Fonts"
-    elif [[ $OSTYPE == "linux-gnu"* ]]; then
+    elif [[ $os_type == "linux" ]]; then
         local fonts_install_dir="$HOME/.fonts"
     else
         error "Unable to install font $1 - unsupported platform"
@@ -424,10 +437,10 @@ install_fonts() {
         installing_package_component_step "Unpacking into $font_unpacked_dir"
         unzip -q "$font_archive_download" -d "$font_unpacked_dir"
 
-        if [[ $OSTYPE == "darwin"* ]]; then
+        if [[ $os_type == "darwin" ]]; then
             installing_package_component_step "Moving $font_ttf -> $fonts_install_dir"
             mv $font_unpacked_dir/$font_ttf $fonts_install_dir
-        elif [[ $OSTYPE == "linux-gnu"* ]]; then
+        elif [[ $os_type == "linux" ]]; then
             local ttf_install_dir="$fonts_install_dir/truetype/$font_name"
             installing_package_component_step "Moving $font_ttf -> $ttf_install_dir"
             mkdir -p $ttf_install_dir
@@ -440,7 +453,7 @@ install_fonts() {
         installing_package_component_done
     done
 
-    if [[ $OSTYPE == "linux-gnu"* ]]; then
+    if [[ $os_type == "linux" ]]; then
         installing_package_component "Rebuilding font info cache"
         fc-cache -f $fonts_install_dir
         installing_package_component_done
@@ -489,7 +502,7 @@ package Curl --command curl --install install_curl
 install_conda() {
     if is_package_manager_found 'brew'; then
         install_os_package miniconda@brew
-    elif [[ $OSTYPE == "linux-gnu"* ]]; then
+    elif [[ $os_type == "linux" ]]; then
         local conda_prefix="$HOME/Sandbox/conda"
         local conda_bootstrap_dst="$conda_prefix/miniconda_bootstrap.sh"
         local conda_bootstrap_url="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
