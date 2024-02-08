@@ -88,7 +88,7 @@ is_known_command() {
 repo_root=$( cd -- "$( dirname -- "$0" )" &> /dev/null && pwd )
 
 found_package_managers=()
-known_package_managers=("aptitude@apt-get" "brew" "snap")
+known_package_managers=("aptitude@apt-get" "brew" "dnf" "snap" "yum")
 
 find_package_managers() {
     for package_manager_info in ${known_package_managers[@]}; do
@@ -280,8 +280,14 @@ install_os_package_command() {
         brew)
             echo brew install $1
             ;;
+        dnf)
+            echo sudo dnf install $1
+            ;;
         snap)
             echo sudo snap install $1 --classic
+            ;;
+        yum)
+            echo sudo yum install $1
             ;;
         *)
             ;;
