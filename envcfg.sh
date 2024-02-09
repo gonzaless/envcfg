@@ -116,6 +116,7 @@ package() {
 
     local name=$1
     local name_lower_case=`to_lower $name`
+    local is_supported_os='true'
     shift
 
     if [[ -n ${packages[@]} ]]; then
@@ -148,6 +149,11 @@ package() {
                 shift
                 shift
                 ;;
+            --os-type)
+                [[ $2 != $os_type ]] && is_supported_os='false'
+                shift
+                shift
+                ;;
             --sync)
                 local sync_cb=$2
                 shift
@@ -159,6 +165,20 @@ package() {
                 ;;
         esac
     done
+
+    # Header
+    echo ""
+    if [[ -z $comment_str ]]; then
+        echo "┌ $name"
+    else
+        echo "┌ $name ($comment_str)"
+    fi
+
+    # Status
+    if [[ $is_supported_os != 'true' ]]; then
+        echo "└ Unsupported platform"
+        return 0
+    fi
 
     is_installed_def() {
         is_known_command $command_str
@@ -180,13 +200,6 @@ package() {
             local status='not found'
             ;;
     esac
-
-    echo ""
-    if [[ -z $comment_str ]]; then
-        echo "┌ $name"
-    else
-        echo "┌ $name ($comment_str)"
-    fi
     echo "├── Status: $status"
 
     # Installation
@@ -642,6 +655,20 @@ sync_alacritty() {
 }
 
 package Alacritty --comment 'terminal emulator' --command alacritty --install install_alacritty --sync sync_alacritty
+
+
+#
+# Gnome Terminal
+#
+install_gnome_terminal() {
+    install_os_package 'gnome-terminal'
+}
+
+sync_gnome_terminal() {
+    echo "TODO PRETEND SYNC"
+}
+
+package 'Gnome-Terminal' --comment 'gnome default terminal emulator' --command 'gnome-terminal' --os-type linux --install install_gnome_terminal --sync sync_gnome_terminal
 
 
 #
