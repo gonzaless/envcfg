@@ -149,6 +149,16 @@ package() {
                 shift
                 shift
                 ;;
+            --get-version)
+                local get_version=$2
+                shift
+                shift
+                ;;
+            --min-version)
+                local min_version=$2
+                shift
+                shift
+                ;;
             --os-type)
                 [[ $2 != $os_type ]] && is_supported_os='false'
                 shift
@@ -174,6 +184,11 @@ package() {
         echo "┌ $name ($comment_str)"
     fi
 
+    # Check args
+    if [[ ! -z $min_version && -z $get_version ]]; then
+        fatal_error "--min-version is specified but --get-version is missing, both are required to assess the installed version"
+    fi
+
     # Status
     if [[ $is_supported_os != 'true' ]]; then
         echo "└ Unsupported platform"
@@ -192,6 +207,9 @@ package() {
     case $? in
         0)
             local status='installed'
+            if [[ ! -z $get_version ]]; then
+                local installed_version=$($get_version)
+            fi
             ;;
         2)
             local status='unknown (unable to check)'
@@ -200,7 +218,12 @@ package() {
             local status='not found'
             ;;
     esac
-    echo "├── Status: $status"
+
+    if [[ -z $installed_version ]]; then
+        echo "├── Status: $status"
+    else
+        echo "├── Status: $status version $installed_version"
+    fi
 
     # Installation
     if [[ $action = deploy && $install_missing = 1 ]]; then
@@ -487,6 +510,10 @@ package Fonts --comment 'Custom fonts tailored for modern terminals' --is-instal
 #
 # Git
 #
+git_version() {
+    git --version | head -1 | cut -d' ' -f3
+}
+
 install_git() {
     install_os_package git
 }
@@ -502,7 +529,7 @@ sync_git() {
     fi
 }
 
-package Git --command git --install install_git --sync sync_git
+package Git --min-version 2.0 --command git --get-version git_version --install install_git --sync sync_git
 
 
 #
@@ -554,21 +581,30 @@ package Conda --comment 'Miniconda package manager' --command conda --install in
 #
 # CMake
 #
+
+cmake_version() {
+    cmake --version | head -1 | cut -d' ' -f3
+}
+
 install_cmake() {
     install_os_package cmake
 }
 
-package CMake --command cmake --install install_cmake
+package CMake --command cmake --get-version cmake_version --install install_cmake
 
 
 #
 # Ninja
 #
+ninja_version() {
+    ninja --version | head -1
+}
+
 install_ninja() {
     install_os_package ninja-build@aptitude ninja@brew
 }
 
-package Ninja --command ninja --install install_ninja
+package Ninja --command ninja --get-version ninja_version --install install_ninja
 
 
 #
@@ -645,6 +681,10 @@ package SSHD --comment 'SSH server - minimal Ubuntu Desktop does not include it'
 #
 # Alacritty
 #
+alacritty_version() {
+    alacritty --version | head -1 | cut -d' ' -f2
+}
+
 install_alacritty() {
     install_os_package alacritty
 }
@@ -654,12 +694,16 @@ sync_alacritty() {
     sync_item .
 }
 
-package Alacritty --comment 'terminal emulator' --command alacritty --install install_alacritty --sync sync_alacritty
+package Alacritty --comment 'terminal emulator' --command alacritty --get-version alacritty_version --install install_alacritty --sync sync_alacritty
 
 
 #
 # Gnome Terminal
 #
+gnome_terminal_version() {
+    gnome-terminal --version | head -1 | cut -d' ' -f4
+}
+
 install_gnome_terminal() {
     install_os_package 'gnome-terminal'
 }
@@ -685,7 +729,7 @@ sync_gnome_terminal() {
     esac
 }
 
-package 'Gnome-Terminal' --comment 'gnome default terminal emulator' --command 'gnome-terminal' --os-type linux --install install_gnome_terminal --sync sync_gnome_terminal
+package 'Gnome-Terminal' --comment 'gnome default terminal emulator' --command 'gnome-terminal' --os-type linux --get-version gnome_terminal_version --install install_gnome_terminal --sync sync_gnome_terminal
 
 
 #
@@ -702,6 +746,10 @@ package Neofetch --command neofetch --sync sync_neofetch
 #
 # Neovim
 #
+nvim_version() {
+    nvim --version | head -1 | cut -c7-
+}
+
 install_nvim() {
     install_os_package neovim@brew nvim@snap neovim@aptitude
 }
@@ -712,12 +760,16 @@ sync_nvim() {
     sync_item 'lua'
 }
 
-package Neovim --command nvim --install install_nvim --sync sync_nvim
+package Neovim --min-version 9.0 --command nvim --get-version nvim_version --install install_nvim --sync sync_nvim
 
 
 #
 # Tmux
 #
+tmux_version() {
+    tmux -V | head -1 | cut -d' ' -f2
+}
+
 install_tmux() {
     install_os_package tmux
 }
@@ -727,7 +779,7 @@ sync_tmux() {
     sync_item '.tmux.conf'
 }
 
-package Tmux --command tmux --install install_tmux --sync sync_tmux
+package Tmux --min-version 3.0 --command tmux --get-version tmux_version --install install_tmux --sync sync_tmux
 
 
 #
@@ -750,6 +802,10 @@ zsh_custom_plugin_info() {
     else
         fatal_error "Failed to parse plugin declaration: $1"
     fi
+}
+
+zsh_version() {
+    zsh --version | head -1 | cut -d' ' -f2
 }
 
 is_zsh_installed() {
@@ -822,7 +878,7 @@ sync_zsh() {
     sync_item '.p10k.zsh'
 }
 
-package Zsh --command zsh --is-installed is_zsh_installed --install install_zsh --sync sync_zsh
+package Zsh --command zsh --get-version zsh_version --is-installed is_zsh_installed --install install_zsh --sync sync_zsh
 
 
 #
