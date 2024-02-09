@@ -665,7 +665,20 @@ install_gnome_terminal() {
 }
 
 sync_gnome_terminal() {
-    echo "TODO PRETEND SYNC"
+    local profiles_dconf_path='/org/gnome/terminal/legacy/profiles:/'
+    local profiles_dump_path=${repo_root}/gnome-terminal/profiles.dconf
+
+    case $action in
+        'backup')
+            dconf dump "$profiles_dconf_path" > "$profiles_dump"
+            ;;
+        'deploy')
+            echo TODO: 'dconf load "$profiles_dconf_path" < "$profiles_dump"'
+            ;;
+        *)
+            fatal_error "Unknown action=${action}"
+            ;;
+    esac
 }
 
 package 'Gnome-Terminal' --comment 'gnome default terminal emulator' --command 'gnome-terminal' --os-type linux --install install_gnome_terminal --sync sync_gnome_terminal
