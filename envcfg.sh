@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 
+clr_reset=$(tput sgr0)
+clr_green=$(tput setaf 2)
+clr_red=$(tput setaf 1)
+clr_yellow=$(tput setaf 3)
+clr_cyan=$(tput setaf 6)
+clr_gray=$(tput setaf 8)
+
 error() {
-    echo "$@" 1>&2
+    echo "${clr_red}$@${clr_reset}" 1>&2
     return 1
 }
 
 fatal_error() {
-    echo "$@" 1>&2
+    echo "${clr_red}$@${clr_reset}" 1>&2
     exit 1
 }
 
@@ -16,6 +23,13 @@ print_help() {
 
 to_lower() {
     echo "$@" | tr '[:upper:]' '[:lower:]'
+}
+
+version_lte() {
+    if [[ -z $1 || -z $2 ]]; then
+        fatal_error "version_lte is called with '$1' and '$2' while two non empty version arguments are expected"
+    fi
+    printf '%s\n' "$1" "$2" | sort -C -V
 }
 
 
@@ -149,6 +163,16 @@ package() {
                 shift
                 shift
                 ;;
+            --get-version)
+                local get_version=$2
+                shift
+                shift
+                ;;
+            --min-version)
+                local min_version=$2
+                shift
+                shift
+                ;;
             --os-type)
                 [[ $2 != $os_type ]] && is_supported_os='false'
                 shift
@@ -169,9 +193,14 @@ package() {
     # Header
     echo ""
     if [[ -z $comment_str ]]; then
-        echo "┌ $name"
+        echo "┌ ${clr_cyan}${name}${clr_reset}"
     else
-        echo "┌ $name ($comment_str)"
+        echo "┌ ${clr_cyan}${name}${clr_gray} - ${comment_str}${clr_reset}"
+    fi
+
+    # Check args
+    if [[ ! -z $min_version && -z $get_version ]]; then
+        fatal_error "--min-version is specified but --get-version is missing, both are required to assess the installed version"
     fi
 
     # Status
@@ -192,15 +221,30 @@ package() {
     case $? in
         0)
             local status='installed'
+            local status_color=$clr_green
+            if [[ ! -z $get_version ]]; then
+                local installed_version=$($get_version)
+                if [[ -z $min_version ]]; then
+                    local version_status=" $installed_version"
+                elif version_lte "$min_version" "$installed_version"; then
+                    local version_status=" $installed_version >= $min_version min required version"
+                else
+                    local version_status=" $installed_version < $min_version min required version"
+                    status_color=$clr_red
+                fi
+            fi
             ;;
         2)
             local status='unknown (unable to check)'
+            local status_color=$clr_yellow
             ;;
         *)
             local status='not found'
+            local status_color=$clr_yellow
             ;;
     esac
-    echo "├── Status: $status"
+
+    echo "├── Status: ${status_color}${status}${version_status}${clr_reset}"
 
     # Installation
     if [[ $action = deploy && $install_missing = 1 ]]; then
@@ -481,12 +525,16 @@ install_fonts() {
     rm -rf "$temp_dir"
 }
 
-package Fonts --comment 'Custom fonts tailored for modern terminals' --is-installed is_fonts_installed --install install_fonts
+package Fonts --comment 'specialized fonts tailored for modern terminals' --is-installed is_fonts_installed --install install_fonts
 
 
 #
 # Git
 #
+git_version() {
+    git --version | head -1 | cut -d' ' -f3
+}
+
 install_git() {
     install_os_package git
 }
@@ -502,7 +550,7 @@ sync_git() {
     fi
 }
 
-package Git --command git --install install_git --sync sync_git
+package Git --min-version 2.0 --command git --get-version git_version --install install_git --sync sync_git
 
 
 #
@@ -548,27 +596,36 @@ install_conda() {
     fi
 }
 
-package Conda --comment 'Miniconda package manager' --command conda --install install_conda
+package Conda --comment 'miniconda package manager' --command conda --install install_conda
 
 
 #
 # CMake
 #
+
+cmake_version() {
+    cmake --version | head -1 | cut -d' ' -f3
+}
+
 install_cmake() {
     install_os_package cmake
 }
 
-package CMake --command cmake --install install_cmake
+package CMake --command cmake --get-version cmake_version --install install_cmake
 
 
 #
 # Ninja
 #
+ninja_version() {
+    ninja --version | head -1
+}
+
 install_ninja() {
     install_os_package ninja-build@aptitude ninja@brew
 }
 
-package Ninja --command ninja --install install_ninja
+package Ninja --command ninja --get-version ninja_version --install install_ninja
 
 
 #
@@ -591,7 +648,7 @@ install_fd() {
     fi
 }
 
-package Fd --comment 'Modern alternative to "find"' --command fd-find --install install_fd
+package Fd --comment 'modern alternative to "find"' --command fd-find --install install_fd
 
 
 #
@@ -609,7 +666,7 @@ install_fzf() {
     $fzf_dst/install
 }
 
-package Fzf --comment 'General-purpose command-line fuzzy finder' --command fzf --install install_fzf
+package Fzf --comment 'general-purpose command-line fuzzy finder' --command fzf --install install_fzf
 
 
 #
@@ -629,7 +686,7 @@ install_ripgrep() {
     install_os_package ripgrep
 }
 
-package Ripgrep --comment 'Modern alternative to "grep"' --command rg --install install_ripgrep
+package Ripgrep --comment 'modern alternative to "grep"' --command rg --install install_ripgrep
 
 
 #
@@ -645,6 +702,10 @@ package SSHD --comment 'SSH server - minimal Ubuntu Desktop does not include it'
 #
 # Alacritty
 #
+alacritty_version() {
+    alacritty --version | head -1 | cut -d' ' -f2
+}
+
 install_alacritty() {
     install_os_package alacritty
 }
@@ -654,12 +715,16 @@ sync_alacritty() {
     sync_item .
 }
 
-package Alacritty --comment 'terminal emulator' --command alacritty --install install_alacritty --sync sync_alacritty
+package Alacritty --comment 'terminal emulator' --command alacritty --get-version alacritty_version --install install_alacritty --sync sync_alacritty
 
 
 #
 # Gnome Terminal
 #
+gnome_terminal_version() {
+    gnome-terminal --version | head -1 | cut -d' ' -f4
+}
+
 install_gnome_terminal() {
     install_os_package 'gnome-terminal'
 }
@@ -685,7 +750,7 @@ sync_gnome_terminal() {
     esac
 }
 
-package 'Gnome-Terminal' --comment 'gnome default terminal emulator' --command 'gnome-terminal' --os-type linux --install install_gnome_terminal --sync sync_gnome_terminal
+package 'Gnome-Terminal' --comment 'gnome default terminal emulator' --command 'gnome-terminal' --os-type linux --get-version gnome_terminal_version --install install_gnome_terminal --sync sync_gnome_terminal
 
 
 #
@@ -702,6 +767,10 @@ package Neofetch --command neofetch --sync sync_neofetch
 #
 # Neovim
 #
+nvim_version() {
+    nvim --version | head -1 | cut -c7-
+}
+
 install_nvim() {
     install_os_package neovim@brew nvim@snap neovim@aptitude
 }
@@ -712,12 +781,16 @@ sync_nvim() {
     sync_item 'lua'
 }
 
-package Neovim --command nvim --install install_nvim --sync sync_nvim
+package Neovim --min-version 0.9 --command nvim --get-version nvim_version --install install_nvim --sync sync_nvim
 
 
 #
 # Tmux
 #
+tmux_version() {
+    tmux -V | head -1 | cut -d' ' -f2
+}
+
 install_tmux() {
     install_os_package tmux
 }
@@ -727,7 +800,7 @@ sync_tmux() {
     sync_item '.tmux.conf'
 }
 
-package Tmux --command tmux --install install_tmux --sync sync_tmux
+package Tmux --min-version 3.0 --command tmux --get-version tmux_version --install install_tmux --sync sync_tmux
 
 
 #
@@ -750,6 +823,10 @@ zsh_custom_plugin_info() {
     else
         fatal_error "Failed to parse plugin declaration: $1"
     fi
+}
+
+zsh_version() {
+    zsh --version | head -1 | cut -d' ' -f2
 }
 
 is_zsh_installed() {
@@ -822,7 +899,7 @@ sync_zsh() {
     sync_item '.p10k.zsh'
 }
 
-package Zsh --command zsh --is-installed is_zsh_installed --install install_zsh --sync sync_zsh
+package Zsh --command zsh --get-version zsh_version --is-installed is_zsh_installed --install install_zsh --sync sync_zsh
 
 
 #
