@@ -666,14 +666,18 @@ install_gnome_terminal() {
 
 sync_gnome_terminal() {
     local profiles_dconf_path='/org/gnome/terminal/legacy/profiles:/'
-    local profiles_dump_path=${repo_root}/gnome-terminal/profiles.dconf
+    local profiles_dump_path="${repo_root}/gnome-terminal/profiles.dconf"
+
+    if ! is_known_command dconf; then
+        error "Unable to sync gnome-terminal profiles - 'dconf' is not found"
+    fi
 
     case $action in
         'backup')
-            dconf dump "$profiles_dconf_path" > "$profiles_dump"
+            dconf dump "$profiles_dconf_path" > "$profiles_dump_path"
             ;;
         'deploy')
-            echo TODO: 'dconf load "$profiles_dconf_path" < "$profiles_dump"'
+            echo TODO: 'dconf load "$profiles_dconf_path" < "$profiles_dump_path"'
             ;;
         *)
             fatal_error "Unknown action=${action}"
