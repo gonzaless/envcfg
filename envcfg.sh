@@ -677,7 +677,7 @@ sync_gnome_terminal() {
             dconf dump "$profiles_dconf_path" > "$profiles_dump_path"
             ;;
         'deploy')
-            echo TODO: 'dconf load "$profiles_dconf_path" < "$profiles_dump_path"'
+            dconf load "$profiles_dconf_path" < "$profiles_dump_path"
             ;;
         *)
             fatal_error "Unknown action=${action}"
