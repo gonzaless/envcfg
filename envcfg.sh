@@ -3,9 +3,10 @@
 repo_root=$( cd -- "$( dirname -- "$0" )" &> /dev/null && pwd )
 
 clr_reset=$(tput sgr0)
-clr_green=$(tput setaf 2)
 clr_red=$(tput setaf 1)
+clr_green=$(tput setaf 2)
 clr_yellow=$(tput setaf 3)
+clr_magenta=$(tput setaf 5)
 clr_cyan=$(tput setaf 6)
 clr_gray=$(tput setaf 8)
 
@@ -495,8 +496,8 @@ sync_item() {
 #
 # Perform action
 #
-echo "Performing '$action' with config repo '$repo_root'"
-echo "OS type='$os_type' name='$os_name' version='$os_version'"
+echo "${clr_gray}Config action=${clr_magenta}${action}${clr_gray} repo=${clr_gray}${repo_root}${clr_reset}"
+echo "${clr_gray}OS type=${clr_cyan}${os_type}${clr_gray} name=${clr_cyan}${os_name}${clr_gray} version=${clr_cyan}${os_version}${clr_reset}"
 
 
 #
