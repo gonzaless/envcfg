@@ -283,14 +283,14 @@ package() {
                     $install_cb
                     case $? in
                         0)
-                            echo "│   └ Done"
+                            echo "│   └ ${clr_green}Done${clr_reset}"
                             status='installed'
                             ;;
                         2)
-                            echo "│   └ Unsupported for this platform"
+                            echo "│   └ ${clr_red}Unsupported for this platform${clr_reset}"
                             ;;
                         *)
-                            echo "│   └ Failed"
+                            echo "│   └ ${clr_red}Failed${clr_reset}"
                             ;;
                     esac
                     ;;
@@ -312,13 +312,13 @@ package() {
             $sync_cb
             case $? in
                 0)
-                    echo "│   └ Done"
+                    echo "│   └ ${clr_green}Done${clr_reset}"
                     ;;
                 2)
-                    echo "│   └ Unsupported for this platform"
+                    echo "│   └ ${clr_red}Unsupported for this platform${clr_reset}"
                     ;;
                 *)
-                    echo "│   └ Failed"
+                    echo "│   └ ${clr_red}Failed${clr_reset}"
                     ;;
             esac
         fi
@@ -396,6 +396,8 @@ install_os_package() {
     done
 
     if [[ -z $install_command ]]; then
+        installing_package_comment "Don't know how to install the package using available package manager(s): ${found_package_managers}"
+        installing_package_comment "Known package variants: $@"
         return 2  # no known version for this platform
     else
         eval ${install_command}
@@ -657,7 +659,7 @@ package Ninja --command ninja --get-version ninja_version --install install_ninj
 # Fd
 #
 install_fd() {
-    install_os_package fd-find@aptitude fd@brew
+    install_os_package fd-find@aptitude fd@brew || return $?
 
     if is_known_command fd; then
         return 0
