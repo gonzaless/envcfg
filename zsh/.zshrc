@@ -13,9 +13,6 @@ if [[ -f $HOME/.p10k.zsh ]]; then
     P10K_IS_AVAILABLE=1
 fi
 
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
-
 # Path to your oh-my-zsh installation.
 export ZSH="${HOME}/.oh-my-zsh"
 
@@ -124,12 +121,6 @@ typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION=''
 
 
 ###############################################################################
-# External Utils Integration
-###############################################################################
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-
-###############################################################################
 # USER Configuration
 ###############################################################################
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -148,13 +139,21 @@ if [[ -z $PREFERRED_EDITOR ]]; then
     export EDITOR=$PREFERRED_EDITOR
 fi
 
-#if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='nvim'
-#else
-#   export EDITOR='mvim'
-#fi
-
+# VI Mode line editor
 bindkey -v
+
+
+###############################################################################
+# PATH
+###############################################################################
+envcfg_add_path_if_exists() {
+    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+        PATH="${PATH:+"$PATH:"}$1"
+    fi
+}
+
+envcfg_add_path_if_exists "$HOME/bin"
+envcfg_add_path_if_exists "$HOME/.local/bin"
 
 
 ###############################################################################
@@ -170,4 +169,10 @@ elif command -v tree &> /dev/null; then
 else
     alias lt='find . -not -path "*/.*" | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"'
 fi
+
+
+###############################################################################
+# External Utils Integration
+###############################################################################
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
