@@ -659,7 +659,7 @@ package Ninja --command ninja --get-version ninja_version --install install_ninj
 # Fd
 #
 install_fd() {
-    install_os_package fd-find@aptitude fd@brew || return $?
+    install_os_package fd-find@aptitude fd@brew fd-find@dnf || return $?
 
     if is_known_command fd; then
         return 0
