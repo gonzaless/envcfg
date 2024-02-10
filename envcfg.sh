@@ -127,16 +127,25 @@ is_package_manager_found() {
 #
 # Package Manager: yum
 #
-yum_repo_endpoint_url="https://packages.endpointdev.com/rhel/${os_version}/os/x86_64/endpoint-repo.x86_64.rpm"
+yum_endpoint_rpm_url="https://packages.endpointdev.com/rhel/${os_version}/os/x86_64/endpoint-repo.x86_64.rpm"
+yum_carlwgeorge_repo_url="https://copr.fedorainfracloud.org/coprs/carlwgeorge/ripgrep/repo/epel-7/carlwgeorge-ripgrep-epel-7.repo"
 
 has_yum_repo() {
     yum repolist | grep "$1" > /dev/null 2>&1
 }
 
-install_yum_repo_if_missing() {
+add_yum_rpm_if_missing() {
+    if ! has_yum_repo "$1"; then
+        installing_package_component "Adding yum rpm '$1', url $2"
+        sudo yum install "$2"
+        installing_package_component_done
+    fi
+}
+
+add_yum_repo_if_missing() {
     if ! has_yum_repo "$1"; then
         installing_package_component "Adding yum repo '$1', url $2"
-        sudo yum install "$2"
+        sudo yum-config-manager --add-repo="$2"
         installing_package_component_done
     fi
 }
@@ -561,7 +570,7 @@ git_version() {
 
 install_git() {
     if [[ $os_name == centos ]]; then
-        install_yum_repo_if_missing endpoint yum_repo_endpoint_url
+        add_yum_rpm_if_missing endpoint yum_endpoint_rpm_url
     fi
     install_os_package git
 }
@@ -710,6 +719,9 @@ package HTop --command htop --install install_htop
 # Ripgrep
 #
 install_ripgrep() {
+    if [[ $os_name == centos ]]; then
+        add_yum_repo_if_missing carlwgeorge "$yum_carlwgeorge_repo_url"
+    fi
     install_os_package ripgrep
 }
 
@@ -820,7 +832,7 @@ tmux_version() {
 
 install_tmux() {
     if [[ $os_name == centos ]]; then
-        install_yum_repo_if_missing endpoint yum_repo_endpoint_url
+        add_yum_rpm_if_missing endpoint yum_endpoint_rpm_url
     fi
     install_os_package tmux
 }
