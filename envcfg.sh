@@ -21,7 +21,8 @@ fatal_error() {
 }
 
 print_help() {
-    echo "Usage: ${0##*/} [-b|--backup] [-d|--deploy [--install-missing]] [-h|--help] [-s|--status] [packages ...]"
+    echo "Usage: ${0##*/} [-s|--status] [-b|--backup] [-d|--deploy] [--install-missing] [-h|--help] [packages ...]"
+    echo "--install-missing could be combined with --status or --deploy but not --backup"
 }
 
 to_lower() {
@@ -58,7 +59,7 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         --install-missing)
-            install_missing=1
+            install_missing=true
             shift
             ;;
         -s|--status)
@@ -77,6 +78,12 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [[ $install_missing == true && $action == backup ]]; then
+    error "--backup can't be combined with --install-missing"
+    print_help
+    exit 1
+fi
 
 
 #
@@ -179,7 +186,7 @@ package() {
 
     local name=$1
     local name_lower_case=`to_lower $name`
-    local is_supported_os='true'
+    local is_supported_os=true
     shift
 
     if [[ -n ${packages[@]} ]]; then
@@ -223,7 +230,7 @@ package() {
                 shift
                 ;;
             --os-type)
-                [[ $2 != $os_type ]] && is_supported_os='false'
+                [[ $2 != $os_type ]] && is_supported_os=false
                 shift
                 shift
                 ;;
@@ -253,7 +260,7 @@ package() {
     fi
 
     # Status
-    if [[ $is_supported_os != 'true' ]]; then
+    if [[ $is_supported_os != true ]]; then
         echo "└ Unsupported platform"
         return 0
     fi
@@ -296,7 +303,7 @@ package() {
     echo "├── Status: ${status_color}${status}${version_status}${clr_reset}"
 
     # Installation
-    if [[ $action = deploy && $install_missing = 1 ]]; then
+    if [[ $install_missing == true ]]; then
         echo "├── Installation"
         if [[ $status == installed ]]; then
             echo "│   └ Skipped (already installed)"
@@ -375,7 +382,7 @@ package_component_is_already_installed() {
 }
 
 install_os_package_command() {
-    if [[ ! $# = 2 ]]; then
+    if [[ ! $# == 2 ]]; then
         fatal_error "Invalid ${FUNCNAME[0]} arguments: $@"
     fi
 
@@ -401,7 +408,7 @@ install_os_package_command() {
 }
 
 install_os_package() {
-    if [[ $# = 0 ]]; then
+    if [[ $# == 0 ]]; then
         fatal_error "Invalid ${FUNCNAME[0]} arguments: $@"
     fi
 
@@ -470,7 +477,7 @@ sync_item() {
         fatal_error "Invalid ${FUNCNAME[0]} arguments: $@"
     fi
 
-    if [[ $1 = "." ]]; then
+    if [[ $1 == "." ]]; then
         src=$src_root
         dst=$dst_root
     else
@@ -594,7 +601,7 @@ install_git() {
 }
 
 sync_git() {
-    if [[ $action = deploy ]]; then
+    if [[ $action == deploy ]]; then
         if is_known_command nvim; then
             git config --global core.editor nvim
         elif is_known_command vim; then
@@ -1047,7 +1054,7 @@ fi
 #
 # Backup status and prompt
 #
-if [[ ! $action = backup ]]; then
+if [[ $action != backup ]]; then
    exit 0
 fi
 
