@@ -148,8 +148,8 @@ is_package_manager_found() {
 #
 # Package Manager: yum
 #
-yum_endpoint_rpm_url="https://packages.endpointdev.com/rhel/${os_version}/os/x86_64/endpoint-repo.x86_64.rpm"
-yum_carlwgeorge_repo_url="https://copr.fedorainfracloud.org/coprs/carlwgeorge/ripgrep/repo/epel-7/carlwgeorge-ripgrep-epel-7.repo"
+yum_endpoint_rpm_url="https://packages.endpointdev.com/rhel/${os_version}/os/x86_64/endpoint-repo.x86_64.rpm"  # git, tmux
+yum_carlwgeorge_repo_url="https://copr.fedorainfracloud.org/coprs/carlwgeorge/ripgrep/repo/epel-7/carlwgeorge-ripgrep-epel-7.repo"  # ripgrep
 
 has_yum_repo() {
     yum repolist | grep "$1" > /dev/null 2>&1
@@ -595,7 +595,7 @@ git_version() {
 
 install_git() {
     if [[ $os_name == centos ]]; then
-        add_yum_rpm_if_missing endpoint yum_endpoint_rpm_url
+        add_yum_rpm_if_missing endpoint "$yum_endpoint_rpm_url"
     fi
     install_os_package git
 }
@@ -875,7 +875,7 @@ tmux_version() {
 
 install_tmux() {
     if [[ $os_name == centos ]]; then
-        add_yum_rpm_if_missing endpoint yum_endpoint_rpm_url
+        add_yum_rpm_if_missing endpoint "$yum_endpoint_rpm_url"
     fi
     install_os_package tmux
 }
