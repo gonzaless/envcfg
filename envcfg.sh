@@ -1060,13 +1060,13 @@ fi
 
 if ! is_known_command git ; then
     echo ''
-    echo 'Unable to show backup diff - git is not installed'
+    error 'Unable to show backup diff - git is not installed'
     exit 0
 fi
 
 if git diff --quiet; then
     echo ''
-    echo 'No changes detected'
+    echo "${clr_green}No changes detected${clr_reset}"
     exit 0
 fi
 
