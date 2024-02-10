@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+repo_root=$( cd -- "$( dirname -- "$0" )" &> /dev/null && pwd )
+
 clr_reset=$(tput sgr0)
 clr_green=$(tput setaf 2)
 clr_red=$(tput setaf 1)
@@ -99,8 +101,10 @@ is_known_command() {
     command -v $1 &> /dev/null
 }
 
-repo_root=$( cd -- "$( dirname -- "$0" )" &> /dev/null && pwd )
 
+#
+# Package Manager
+#
 found_package_managers=()
 known_package_managers=("aptitude@apt-get" "brew" "dnf" "snap" "yum")
 
@@ -117,6 +121,24 @@ find_package_managers
 
 is_package_manager_found() {
     [[ " ${found_package_managers[@]} " =~ " $1 " ]]
+}
+
+
+#
+# Package Manager: yum
+#
+yum_repo_endpoint_url="https://packages.endpointdev.com/rhel/${os_version}/os/x86_64/endpoint-repo.x86_64.rpm"
+
+has_yum_repo() {
+    yum repolist | grep "$1" > /dev/null 2>&1
+}
+
+install_yum_repo_if_missing() {
+    if ! has_yum_repo "$1"; then
+        installing_package_component "Adding yum repo '$1', url $2"
+        sudo yum install "$2"
+        installing_package_component_done
+    fi
 }
 
 
@@ -536,6 +558,9 @@ git_version() {
 }
 
 install_git() {
+    if [[ $os_name == centos ]]; then
+        install_yum_repo_if_missing endpoint yum_repo_endpoint_url
+    fi
     install_os_package git
 }
 
@@ -792,6 +817,9 @@ tmux_version() {
 }
 
 install_tmux() {
+    if [[ $os_name == centos ]]; then
+        install_yum_repo_if_missing endpoint yum_repo_endpoint_url
+    fi
     install_os_package tmux
 }
 
