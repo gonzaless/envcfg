@@ -101,6 +101,19 @@ is_known_command() {
     command -v $1 &> /dev/null
 }
 
+append_file_line_if_missing() {
+    local path="$1"
+    local line="$2"
+
+    grep -qxF "$line" "$path" && return 0
+
+    if [[ -w $path ]]; then
+        echo "$line" >> "$path"
+    else
+        sudo echo "$line" >> "$path"
+    fi
+}
+
 
 #
 # Package Manager
@@ -132,6 +145,10 @@ yum_carlwgeorge_repo_url="https://copr.fedorainfracloud.org/coprs/carlwgeorge/ri
 
 has_yum_repo() {
     yum repolist | grep "$1" > /dev/null 2>&1
+}
+
+has_yum_package() {
+    yum list installed | grep "^$1" > /dev/null 2>&1
 }
 
 add_yum_rpm_if_missing() {
@@ -910,9 +927,65 @@ is_zsh_installed() {
     return 0
 }
 
+install_zsh_centos() {
+    local zsh_version="5.9"
+    local zsh_tar="zsh-${zsh_version}.tar.xz"
+    local zsh_tar_url="https://sourceforge.net/projects/zsh/files/zsh/${zsh_version}/${zsh_tar}"
+    local zsh_path="/usr/local/bin/zsh"
+
+    installing_package_comment "CentOS packages are very old, installing ZSH from source..."
+    installing_package_component "Checking build dependencies"
+    if ! is_known_command gcc; then
+        sudo yum groupinstall "Development tools" || return 1
+    fi
+    if ! has_yum_package "ncurses-devel"; then
+        sudo yum install "ncurses-devel" || return 1
+    fi
+    installing_package_component_done
+
+    local temp_dir=`mktemp -d`
+    local zsh_tar_path="$temp_dir/$zsh_tar"
+    local zsh_src_path="$temp_dir/zsh-${zsh_version}"
+
+    installing_package_component "Downloading ZSH source code from $zsh_tar_url into $temp_dir"
+    wget --quiet --directory-prefix="$temp_dir" "$zsh_tar_url" || return 1
+    installing_package_component_done
+
+    installing_package_component "Unpacking $zsh_tar_path"
+    tar -xf "$zsh_tar_path" -C "$temp_dir"
+    [[ ! -d $zsh_src_path ]] || ( error "Can't locate unpacked source code at $zsh_src_path" ; return 1 )
+    installing_package_component_done
+
+    build_and_install() {
+        cd "$zsh_src_path"
+
+        installing_package_component "Building $zsh_src_path"
+        ./configure || return 1
+        make || return 1
+        installing_package_component_done
+
+        installing_package_component "Installing ZSH"
+        sudo make install || return 1
+        installing_package_component_done
+    }
+
+    local cur_dir=`pwd`
+    build_and_install
+    cd "$cur_dir"
+    rm -rf "$temp_dir"
+
+    [[ -f $zsh_path ]] || ( error "Unable to locate zsh at $zsh_path" ; return 1 )
+
+    installing_package_component "Register ZSH and make it default"
+    append_file_line_if_missing "/etc/shells" "$zsh_path"
+    installing_package_component_done
+}
+
 install_zsh() {
     if is_known_command zsh; then
         package_component_is_already_installed 'zsh'
+    elif [[ $os_name == centos ]]; then
+        install_zsh_centos
     else
         install_os_package zsh
     fi
