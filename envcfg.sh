@@ -163,7 +163,7 @@ add_yum_rpm_if_missing() {
     if ! has_yum_repo "$1"; then
         installing_package_component "Adding yum rpm '$1', url $2"
         sudo yum install "$2"
-        installing_package_component_done
+        installing_package_component_end
     fi
 }
 
@@ -171,7 +171,7 @@ add_yum_repo_if_missing() {
     if ! has_yum_repo "$1"; then
         installing_package_component "Adding yum repo '$1', url $2"
         sudo yum-config-manager --add-repo="$2"
-        installing_package_component_done
+        installing_package_component_end
     fi
 }
 
@@ -369,8 +369,10 @@ installing_package_component() {
     echo "│   ├ $1 ..."
 }
 
-installing_package_component_done() {
-    echo "│   │ └ Done"
+installing_package_component_end() {
+    local ret=$?
+    [[ $ret == 0 ]] && echo "│   │ └ Done" || echo "│   │ └ ${clr_red}Failed${clr_reset}"
+    return $ret
 }
 
 installing_package_component_step() {
@@ -571,13 +573,13 @@ install_fonts() {
             error "Unable to install font $1 - unsupported platform"
         fi
 
-        installing_package_component_done
+        installing_package_component_end
     done
 
     if [[ $os_type == "linux" ]]; then
         installing_package_component "Rebuilding font info cache"
         fc-cache -f $fonts_install_dir
-        installing_package_component_done
+        installing_package_component_end
     fi
 
     rm -rf "$temp_dir"
@@ -637,19 +639,19 @@ install_conda() {
 
         installing_package_component "Creating conda directory $conda_prefix"
         mkdir -p "$conda_prefix"
-        installing_package_component_done
+        installing_package_component_end
 
         installing_package_component "Downloading conda boostrap script  $conda_bootstrap_url -> $conda_bootstrap_dst"
         wget --quiet "$conda_bootstrap_url" -O "$conda_bootstrap_dst"
-        installing_package_component_done
+        installing_package_component_end
 
         installing_package_component "Running conda boostrap script $conda_bootstrap_dst with conda prefix $conda_prefix"
         bash "$conda_bootstrap_dst" -b -u -p "$conda_prefix"
-        installing_package_component_done
+        installing_package_component_end
 
         installing_package_component "Removing conda boostrap script $conda_bootstrap_dst"
         rm "$conda_bootstrap_dst"
-        installing_package_component_done
+        installing_package_component_end
 
         installing_package_comment "WARNING: run 'conda init' after installation"
     else
@@ -946,25 +948,23 @@ install_zsh_from_source() {
     local zsh_src_path="$temp_dir/zsh-${zsh_version}"
 
     installing_package_component "Downloading ZSH source code from $zsh_tar_url into $temp_dir"
-    wget --quiet --directory-prefix="$temp_dir" "$zsh_tar_url" || return 1
-    installing_package_component_done
+    wget --quiet --directory-prefix="$temp_dir" "$zsh_tar_url"
+    installing_package_component_end || return 1
 
     installing_package_component "Unpacking $zsh_tar_path"
-    tar -xf "$zsh_tar_path" -C "$temp_dir"
-    [[ -d $zsh_src_path ]] || { error "Can't locate unpacked source code at $zsh_src_path"; return 1; }
-    installing_package_component_done
+    tar -xf "$zsh_tar_path" -C "$temp_dir" && { [[ -d $zsh_src_path ]] || { error "Can't locate unpacked source code at $zsh_src_path"; false; }; }
+    installing_package_component_end || return 1
 
     build_and_install() {
         cd "$zsh_src_path"
 
         installing_package_component "Building $zsh_src_path"
-        ./configure --quiet || return 1
-        make --silent || return 1
-        installing_package_component_done
+        ./configure > build_stage_configure.log && make > build_stage_make.log
+        installing_package_component_end || return 1
 
         installing_package_component "Installing ZSH"
-        sudo make --silent install || return 1
-        installing_package_component_done
+        sudo make install > build_stage_make_install.log
+        installing_package_component_end || return 1
     }
 
     local cur_dir=`pwd`
@@ -976,7 +976,7 @@ install_zsh_from_source() {
 
     installing_package_component "Adding to known shells"
     append_file_line_if_missing "/etc/shells" "$zsh_path"
-    installing_package_component_done
+    installing_package_component_end
 }
 
 install_zsh_centos() {
@@ -989,7 +989,7 @@ install_zsh_centos() {
     if ! has_yum_package "ncurses-devel"; then
         sudo yum install "ncurses-devel" || return 1
     fi
-    installing_package_component_done
+    installing_package_component_end
 
     install_zsh_from_source
 }
@@ -1031,7 +1031,7 @@ install_zsh() {
 
         installing_package_component "$custom_plugin_name $custom_plugin_type"
         git clone --depth=1 "${custom_plugin_http}" "${custom_plugin_dest}"
-        installing_package_component_done
+        installing_package_component_end
     done
 
     if [[ -n $ZSH_VERSION ]]; then
