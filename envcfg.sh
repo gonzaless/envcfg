@@ -961,7 +961,7 @@ install_zsh_centos() {
 
     installing_package_component "Unpacking $zsh_tar_path"
     tar -xf "$zsh_tar_path" -C "$temp_dir"
-    [[ ! -d $zsh_src_path ]] || ( error "Can't locate unpacked source code at $zsh_src_path" ; return 1 )
+    [[ -d $zsh_src_path ]] || { error "Can't locate unpacked source code at $zsh_src_path"; return 1; }
     installing_package_component_done
 
     build_and_install() {
@@ -982,7 +982,7 @@ install_zsh_centos() {
     cd "$cur_dir"
     rm -rf "$temp_dir"
 
-    [[ -f $zsh_path ]] || ( error "Unable to locate zsh at $zsh_path" ; return 1 )
+    [[ -f $zsh_path ]] || { error "Unable to locate zsh at $zsh_path"; return 1; }
 
     installing_package_component "Adding to known shells"
     append_file_line_if_missing "/etc/shells" "$zsh_path"
