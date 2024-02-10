@@ -811,6 +811,24 @@ nvim_version() {
 }
 
 install_nvim() {
+    if [[ $os_name == centos ]]; then
+        installing_package_comment "CentOS packages are very old, installing nvim using AppImage..."
+
+        if ! is_known_command curl; then
+            installing_package_comment "'curl' is required for installation but missing"
+            return 1
+        fi
+
+        local home_local_bin="$HOME/.local/bin"
+        mkdir -p "$home_local_bin"
+
+        local nvim_appimage_url="https://github.com/neovim/neovim/releases/download/stable/nvim.appimage"
+        local nvim_install_path="${home_local_bin}/nvim"
+        curl -o "$nvim_install_path" -LO "$nvim_appimage_url" || return 1
+        chmod u+x "$nvim_install_path"
+        return 0
+    fi
+
     install_os_package neovim@brew nvim@snap neovim@aptitude
 }
 
