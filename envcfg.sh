@@ -935,21 +935,11 @@ is_zsh_installed() {
     return 0
 }
 
-install_zsh_centos() {
+install_zsh_from_source() {
     local zsh_version="5.9"
     local zsh_tar="zsh-${zsh_version}.tar.xz"
     local zsh_tar_url="https://sourceforge.net/projects/zsh/files/zsh/${zsh_version}/${zsh_tar}"
     local zsh_path="/usr/local/bin/zsh"
-
-    installing_package_comment "CentOS packages are very old, installing ZSH from source..."
-    installing_package_component "Checking build dependencies"
-    if ! is_known_command gcc; then
-        sudo yum groupinstall "Development tools" || return 1
-    fi
-    if ! has_yum_package "ncurses-devel"; then
-        sudo yum install "ncurses-devel" || return 1
-    fi
-    installing_package_component_done
 
     local temp_dir=`mktemp -d`
     local zsh_tar_path="$temp_dir/$zsh_tar"
@@ -968,12 +958,12 @@ install_zsh_centos() {
         cd "$zsh_src_path"
 
         installing_package_component "Building $zsh_src_path"
-        ./configure || return 1
-        make || return 1
+        ./configure --quiet || return 1
+        make --silent || return 1
         installing_package_component_done
 
         installing_package_component "Installing ZSH"
-        sudo make install || return 1
+        sudo make --silent install || return 1
         installing_package_component_done
     }
 
@@ -987,6 +977,21 @@ install_zsh_centos() {
     installing_package_component "Adding to known shells"
     append_file_line_if_missing "/etc/shells" "$zsh_path"
     installing_package_component_done
+}
+
+install_zsh_centos() {
+    installing_package_comment "CentOS packages are very old, installing ZSH from source..."
+
+    installing_package_component "Checking build dependencies"
+    if ! is_known_command gcc; then
+        sudo yum groupinstall "Development tools" || return 1
+    fi
+    if ! has_yum_package "ncurses-devel"; then
+        sudo yum install "ncurses-devel" || return 1
+    fi
+    installing_package_component_done
+
+    install_zsh_from_source
 }
 
 install_zsh() {
