@@ -147,13 +147,17 @@ bindkey -v
 # PATH
 ###############################################################################
 envcfg_add_path_if_exists() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-        PATH="${PATH:+"$PATH:"}$1"
+    if [[ -d "$1" ]] && [[ ":$PATH:" != *":$1:"* ]]; then
+        if [[ $2 == prepend ]]; then
+            PATH="$1${PATH:+":$PATH"}"
+        else
+            PATH="${PATH:+"$PATH:"}$1"
+        fi
     fi
 }
 
-envcfg_add_path_if_exists "$HOME/bin"
-envcfg_add_path_if_exists "$HOME/.local/bin"
+envcfg_add_path_if_exists "$HOME/bin" prepend
+envcfg_add_path_if_exists "$HOME/.local/bin" prepend
 
 
 ###############################################################################
