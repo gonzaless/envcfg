@@ -36,6 +36,25 @@ version_lte() {
     printf '%s\n' "$1" "$2" | sort -C -V
 }
 
+input_prompt() {
+    local prompt="$1"
+    local defval="$2"
+    local result="$2"
+
+    if [[ $BASH_VERSION == 3* ]]; then
+        read -p "${prompt}${result:+" (default $result)"}: " result
+        [[ -z $result ]] && result="$defval"
+    elif [[ ! -z $BASH_VERSION ]]; then
+        read -e -p "$prompt: " -i "$result" result
+    elif [[ ! -z $ZSH_VERSION ]]; then
+        vared -p "$prompt: " result
+    else
+        fatal_error Unsupported shell $SHELL
+    fi
+
+    echo "$result"
+}
+
 
 #
 # Parse command line
@@ -635,7 +654,12 @@ install_conda() {
     if is_package_manager_found 'brew'; then
         install_os_package miniconda@brew
     elif [[ $os_type == "linux" ]]; then
-        local conda_prefix="$HOME/Sandbox/conda"
+        local conda_prefix=`input_prompt "│   ├ Conda prefix" "$HOME/conda"`
+        if [[ -z $conda_prefix ]]; then
+            error "Conda prefix can't be empty. Installation aborted"
+            return 1
+        fi
+
         local conda_bootstrap_dst="$conda_prefix/miniconda_bootstrap.sh"
         local conda_bootstrap_url="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
 
