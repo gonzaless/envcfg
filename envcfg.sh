@@ -101,6 +101,8 @@ else
     fatal_error "Unsupported platform"
 fi
 
+os_version_major=${os_version%%.*}
+
 is_in_path() {
     [[ ":$PATH:" == *":$1:"* ]]
 }
@@ -148,8 +150,8 @@ is_package_manager_found() {
 #
 # Package Manager: yum
 #
-yum_endpoint_rpm_url="https://packages.endpointdev.com/rhel/${os_version}/os/x86_64/endpoint-repo.x86_64.rpm"  # git, tmux
-yum_carlwgeorge_repo_url="https://copr.fedorainfracloud.org/coprs/carlwgeorge/ripgrep/repo/epel-7/carlwgeorge-ripgrep-epel-7.repo"  # ripgrep
+yum_endpoint_rpm_url="https://packages.endpointdev.com/rhel/${os_version_major}/os/x86_64/endpoint-repo.x86_64.rpm"  # git, tmux
+yum_carlwgeorge_repo_url="https://copr.fedorainfracloud.org/coprs/carlwgeorge/ripgrep/repo/epel-${os_version_major}/carlwgeorge-ripgrep-epel-${os_version_major}.repo"  # ripgrep
 
 has_yum_repo() {
     yum repolist | grep "$1" > /dev/null 2>&1
