@@ -853,6 +853,24 @@ install_nvim() {
         local nvim_install_path="${home_local_bin}/nvim"
         curl -o "$nvim_install_path" -LO "$nvim_appimage_url" || return 1
         chmod u+x "$nvim_install_path"
+
+        # WARNING: old gcc will likely cause nvim treesitter scanner compilation errors
+        # One way around is to install a newer version of gcc and launch nvim with gcc
+        # resolving as that new version (system gcc doesn't need to be replaced). After
+        # the scanners have been compiled nvim could be further launched in a regular
+        # environment
+        #
+        # Consider using SLC Devtools for that:
+        # > sudo yum install centos-release-scl
+        # > sudo yum install devtoolset-9-gcc
+        # > scl enable devtoolset-9 zsh
+        # > which gcc
+        # /opt/rh/devtoolset-9/root/usr/bin/gcc
+        # > nvim
+        # > exit
+        # > which gcc
+        # /usr/bin/gcc
+        # > nvim # launches without issues
         return 0
     fi
 
