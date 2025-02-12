@@ -112,18 +112,61 @@ dotfiles() {
             esac
         done
 
+        local result=0
         for file in "${files[@]}"; do
             local source="$HOME/.$file"
-            local target="$dotf_repo/$file"
-            block_entry "$source -> $target"
+            local backup="$HOME/.$file.bak"
+            local target="$dotf_link/$file"
+            local actual=$(realpath "$source" 2>/dev/null)
+            block_entry "$source"
+            block_entry "  target: $target"
+            block_entry "  actual: $actual"
+
+            if [[ $action == deploy ]]; then
+                if [[ -f $source && ! -L $source ]]; then
+                    block_entry "  creating backup $backup ..."
+                    if ! mv "$source" "$backup" ; then
+                        result=1
+                        continue
+                    fi
+                fi
+
+                ln -shf "$target" "$dotf_link"
+                continue
+            fi
+
+            if [[ $action == remove ]]; then
+                if [[ ! -f $source ]]; then
+                    continue
+                fi
+                if [[ ! -L $source ]]; then
+                    block_error "  $source is not a symlink, skipping"
+                    continue
+                fi
+                if [[ $actual != $target ]]; then
+                    block_error "  $source is a symlink, but it's target $actual does not match $target, skipping"
+                    continue
+                fi
+
+                block_error "  removing $source ..."
+                if ! rm "$source" ; then
+                    continue
+                fi
+
+                if [[ -f "$backup" ]]; then
+                  block_error "  restoring original from $backup ..."
+                  mv "$backup" "$source"
+                fi
+                continue
+            fi
         done
 
-        block_end $?
+        block_end $result
     }
 
     dotfiles_group bash --files bash_profile bashrc
-    dotfiles_group zsh --files zshrc
-    dotfiles_group tmux --files tmux.conf
+    #dotfiles_group zsh --files zshrc
+    #dotfiles_group tmux --files tmux.conf
 }
 
 dotfiles $@
