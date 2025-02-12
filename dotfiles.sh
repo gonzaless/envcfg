@@ -2,7 +2,8 @@
 
 dotfiles() {
     local repo_root=$( cd -- "$( dirname -- "$0" )" &> /dev/null && pwd )
-    source ${repo_root}/utility/core.sh
+    source ${repo_root}/utility/io.sh
+    source ${repo_root}/utility/os.sh
 
     dotfiles_print_help() {
         echo "Usage: ${0##*/} [-s|--status] [-d|--deploy] [-r|--remove] [-h|--help] [groups ...]"
@@ -41,55 +42,50 @@ dotfiles() {
         esac
     done
 
-    local dotf_link="${HOME}/.dotfiles"
-    local dotf_repo="$repo_root/dotfiles"
+    local dotf_lnk="${HOME}/.dotfiles"
+    local dotf_dir="$repo_root/dotfiles"
 
     dotfiles_symlink() {
-        local dotf_curr=$(realpath "$dotf_link" 2>/dev/null)
+        local dotf_cur=""
 
-        block_title "dotfiles link $dotf_link"
-        block_entry "target: $dotf_repo"
-        block_entry "actual: ${dotf_curr:-not installed}"
-
-        if [[ $action == deploy ]]; then
-            if [[ $dotf_curr == $dotf_repo ]]; then
-                block_end 0
-                return
-            fi
-
-            if [[ -n $dotf_curr ]]; then
-                block_error "link already exist and does not reference this repo"
-                block_end $?
-                return
-            fi
-
-            block_entry "installing ..."
-            ln -shf "$dotf_repo" "$dotf_link"
-            block_end $?
-            return
+        block_title "dotfiles link $dotf_lnk"
+        if [[ ! -e $dotf_lnk ]]; then
+            block_entry "is missing"
+        elif [[ ! -L $dotf_lnk ]]; then
+            dotf_cur="$dotf_lnk"
+            block_entry "is not a symlink"
+        elif
+            dotf_cur=$(readlink "$dotf_lnk" 2>/dev/null)
+            block_entry "-> $dotf_cur)"
         fi
 
-        if [[ $action == remove ]]; then
-            if [[ -z $dotf_curr ]]; then
-                block_end 0
-                return
-            fi
+        case "$action" in
+            deploy)
+                if [[ $dotf_cur == $dotf_dir ]]; then
+                    block_entry "nothing to do"
+                elif [[ -e $dotf_lnk && ! -L $dotf_lnk ]]; then
+                    block_error "unable to install the link: path already exist and is not a link"
+                    block_error "in order to continue remove it manually"
+                else
+                    block_entry "installing ..."
+                    ln -shf "$dotf_dir" "$dotf_lnk"
+                fi
+                ;;
 
-            if [[ $dotf_curr != $dotf_repo ]]; then
-                block_error "link exists but does not reference this repo, skipping"
-                block_end $?
-                return
-            fi
+            remove)
+                if [[ ! -e $dotf_lnk ]]; then
+                    block_entry "nothing to do"
+                elif [[ ! -L $dotf_lnk ]]; then
+                    block_error "path is not a link, skipping"
+                else
+                    block_entry "removing ..."
+                    rm "$dotf_lnk"
+                fi
+                ;;
+        esac
 
-            block_entry "removing ..."
-            rm "$dotf_link"
-            block_end $?
-            return
-        fi
-
-        block_end 0
+        block_end $?
     }
-    dotfiles_symlink
 
     dotfiles_group() {
         block_title $1
@@ -113,10 +109,12 @@ dotfiles() {
         done
 
         local result=0
-        for file in "${files[@]}"; do
+        for os_file in "${files[@]}"; do
+            local file_os="${string%%:*}"
+            local file="${string#*:}"
             local source="$HOME/.$file"
             local backup="$HOME/.$file.bak"
-            local target="$dotf_link/$file"
+            local target="$dotf_lnk/$file"
             local actual=$(realpath "$source" 2>/dev/null)
             block_entry "$source"
             block_entry "  target: $target"
@@ -150,7 +148,7 @@ dotfiles() {
                     continue
                 fi
 
-                if [[ -f "$backup" ]]; then
+                if [[ -f $backup ]]; then
                   block_error "  restoring original from $backup ..."
                   mv "$backup" "$source"
                 fi
@@ -161,9 +159,17 @@ dotfiles() {
         block_end $result
     }
 
-    dotfiles_group bash --files bash_profile bashrc
+    if [[ $action != remove ]]; then
+        dotfiles_symlink
+    fi
+
+    #dotfiles_group bash --files linux:bash_profile bashrc
     #dotfiles_group zsh --files zshrc
     #dotfiles_group tmux --files tmux.conf
+
+    if [[ $action == remove ]]; then
+        dotfiles_symlink
+    fi
 }
 
 dotfiles $@
