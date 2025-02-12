@@ -50,13 +50,13 @@ dotfiles() {
 
         block_title "dotfiles link $dotf_lnk"
         if [[ ! -e $dotf_lnk ]]; then
-            block_entry "is missing"
+            block_entry "not installed"
         elif [[ ! -L $dotf_lnk ]]; then
             dotf_cur="$dotf_lnk"
             block_entry "is not a symlink"
-        elif
+        else
             dotf_cur=$(readlink "$dotf_lnk" 2>/dev/null)
-            block_entry "-> $dotf_cur)"
+            block_entry "-> $dotf_cur"
         fi
 
         case "$action" in
