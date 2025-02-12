@@ -89,8 +89,35 @@ dotfiles() {
 
         block_end 0
     }
-
     dotfiles_symlink
+
+    dotfiles_group() {
+        block_title $1
+        local files=()
+        shift
+
+        while [[ $# -gt 0 ]]; do
+            case $1 in
+                --files)
+                    shift
+                    while [[ $# -gt 0 && "$1" != --* ]]; do
+                        files+=("$1")
+                        shift
+                    done
+                    ;;
+                *)
+                    echo "Unknown option $1"
+                    return 1
+                    ;;
+            esac
+        done
+
+        block_end $?
+    }
+
+    dotfiles_group bash --files bash_profile bashrc
+    dotfiles_group zsh --files zshrc
+    dotfiles_group tmux --files tmux.conf
 }
 
 dotfiles $@
