@@ -131,20 +131,17 @@ dotfiles() {
                     fi
                 fi
 
-                ln -shf "$target" "$dotf_link"
+                ln -shf "$target" "$source"
                 continue
             fi
 
             if [[ $action == remove ]]; then
-                if [[ ! -f $source ]]; then
-                    continue
-                fi
                 if [[ ! -L $source ]]; then
-                    block_error "  $source is not a symlink, skipping"
+                    block_error "  path is not a symlink, skipping"
                     continue
                 fi
                 if [[ $actual != $target ]]; then
-                    block_error "  $source is a symlink, but it's target $actual does not match $target, skipping"
+                    block_error "  path is a symlink, but it's target $actual does not match $target, skipping"
                     continue
                 fi
 
