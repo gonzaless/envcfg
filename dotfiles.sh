@@ -112,6 +112,12 @@ dotfiles() {
             esac
         done
 
+        for file in "${files[@]}"; do
+            local source="$HOME/.$file"
+            local target="$dotf_repo/$file"
+            block_entry "$source -> $target"
+        done
+
         block_end $?
     }
 
