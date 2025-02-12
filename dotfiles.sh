@@ -141,10 +141,11 @@ dotfiles() {
                 fi
             fi
 
-            local entry_result=0
+            local entry_result=$?
 
             case "$action" in
                 deploy)
+                    entry_result=0
                     if [[ -f $source && ! -L $source ]]; then
                         block_entry2 "creating backup $backup ..."
                         mv "$source" "$backup"
@@ -159,6 +160,7 @@ dotfiles() {
                     ;;
 
                 remove)
+                    entry_result=0
                     if [[ ! -e $source && ! -L $source ]]; then
                         block_entry2 "nothing to do"
                     elif [[ ! -L $source ]]; then
@@ -178,10 +180,10 @@ dotfiles() {
                     ;;
             esac
 
-            block_end2 $entry_result || result=1
+            block_end2 $entry_result || group_result=1
         done
 
-        block_end $result
+        block_end $group_result
     }
 
     if [[ $action != remove ]]; then
