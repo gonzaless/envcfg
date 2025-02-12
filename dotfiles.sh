@@ -191,8 +191,8 @@ dotfiles() {
     fi
 
     dotfiles_group bash --files linux:bash_profile bashrc
-    #dotfiles_group zsh --files zshrc
-    #dotfiles_group tmux --files tmux.conf
+    dotfiles_group zsh --files zshrc
+    dotfiles_group tmux --files tmux.conf
 
     if [[ $action == remove ]]; then
         dotfiles_symlink
