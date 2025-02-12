@@ -112,10 +112,15 @@ dotfiles() {
             esac
         done
 
+        local os=$(os_type)
         local result=0
         for os_file in "${files[@]}"; do
-            local file_os="${string%%:*}"
+            local target_os="${string%%:*}"
             local file="${string#*:}"
+            if [[ -z $target_os || $target_os == $os ]]; then
+                continue
+            fi
+
             local source="$HOME/.$file"
             local backup="$HOME/.$file.bak"
             local target="$dotf_lnk/$file"
@@ -124,6 +129,23 @@ dotfiles() {
             block_entry "  target: $target"
             block_entry "  actual: $actual"
 
+            case "$action" in
+                deploy)
+                    if [[ -f $source && ! -L $source ]]; then
+                        block_entry "  creating backup $backup ..."
+                        if ! mv "$source" "$backup" ; then
+                            result=1
+                            continue
+                        fi
+                    fi
+
+                    ln -shf "$target" "$source"
+                    continue
+                    ;;
+
+                remove)
+                    ;;
+            esac
             if [[ $action == deploy ]]; then
                 if [[ -f $source && ! -L $source ]]; then
                     block_entry "  creating backup $backup ..."

@@ -22,12 +22,25 @@ block_title() {
     echo "┌─ ${clr_cyan}${1}${clr_reset}"
 }
 
+block_title2() {
+    echo "├─┬─ ${clr_cyan}${1}${clr_reset}"
+}
+
 block_entry() {
     echo "│ $1"
 }
 
+block_entry2() {
+    echo "│ │ $1"
+}
+
 block_error() {
-    echo "│ ${clr_red}${1}${clr_reset}"
+    block_entry "${clr_red}${1}${clr_reset}"
+    return 1
+}
+
+block_error2() {
+    block_entry2 "${clr_red}${1}${clr_reset}"
     return 1
 }
 
@@ -39,6 +52,15 @@ block_end() {
     fi
 
     echo ''
+    return $1
+}
+
+block_end2() {
+    if [[ $1 == 0 ]] ; then
+        echo "│ └─ ${clr_green}OK${clr_reset}"
+    else
+        echo "│ └─ ${clr_red}ERR${clr_reset}"
+    fi
     return $1
 }
 
