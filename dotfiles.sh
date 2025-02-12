@@ -112,7 +112,7 @@ dotfiles() {
             esac
         done
 
-        local result=0
+        local group_result=0
         local os=$(os_type)
 
         for os_file in "${files[@]}"; do
@@ -141,44 +141,44 @@ dotfiles() {
                 fi
             fi
 
-            #case "$action" in
-                #deploy)
-                    #if [[ -f $source && ! -L $source ]]; then
-                        #block_entry "  creating backup $backup ..."
-                        #if ! mv "$source" "$backup" ; then
-                            #result=1
-                            #continue
-                        #fi
-                    #fi
+            local entry_result=0
 
-                    #ln -shf "$target" "$source"
-                    #continue
-                    #;;
+            case "$action" in
+                deploy)
+                    if [[ -f $source && ! -L $source ]]; then
+                        block_entry2 "creating backup $backup ..."
+                        mv "$source" "$backup"
+                        entry_result=$?
+                    fi
 
-                #remove)
-                    #if [[ ! -L $source ]]; then
-                        #block_error "  path is not a symlink, skipping"
-                        #continue
-                    #fi
-                    #if [[ $actual != $target ]]; then
-                        #block_error "  path is a symlink, but it's target $actual does not match $target, skipping"
-                        #continue
-                    #fi
+                    if [[ $entry_result == 0 ]]; then
+                        block_entry2 "installing -> $dotf_dir ..."
+                        ln -shf "$target" "$source"
+                        entry_result=$?
+                    fi
+                    ;;
 
-                    #block_error "  removing $source ..."
-                    #if ! rm "$source" ; then
-                        #continue
-                    #fi
+                remove)
+                    if [[ ! -e $source && ! -L $source ]]; then
+                        block_entry2 "nothing to do"
+                    elif [[ ! -L $source ]]; then
+                        block_error2 "path is not a link, skipping"
+                        entry_result=$?
+                    else
+                        block_entry2 "removing ..."
+                        rm "$source"
+                        entry_result=$?
+                    fi
 
-                    #if [[ -f $backup ]]; then
-                      #block_error "  restoring original from $backup ..."
-                      #mv "$backup" "$source"
-                    #fi
-                    #continue
-                    #;;
-            #esac
+                    if [[ $entry_result == 0 && -f $backup ]]; then
+                      block_entry2 "restoring original from $backup ..."
+                      mv "$backup" "$source"
+                      entry_result=$?
+                    fi
+                    ;;
+            esac
 
-            block_end2 $result
+            block_end2 $entry_result || result=1
         done
 
         block_end $result
