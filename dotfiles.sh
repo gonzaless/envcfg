@@ -124,62 +124,60 @@ dotfiles() {
             local source="$HOME/.$file"
             local backup="$HOME/.$file.bak"
             local target="$dotf_lnk/$file"
-            local actual=$(realpath "$source" 2>/dev/null)
-            block_entry "$source"
-            block_entry "  target: $target"
-            block_entry "  actual: $actual"
+            local current=""
 
-            case "$action" in
-                deploy)
-                    if [[ -f $source && ! -L $source ]]; then
-                        block_entry "  creating backup $backup ..."
-                        if ! mv "$source" "$backup" ; then
-                            result=1
-                            continue
-                        fi
-                    fi
-
-                    ln -shf "$target" "$source"
-                    continue
-                    ;;
-
-                remove)
-                    ;;
-            esac
-            if [[ $action == deploy ]]; then
-                if [[ -f $source && ! -L $source ]]; then
-                    block_entry "  creating backup $backup ..."
-                    if ! mv "$source" "$backup" ; then
-                        result=1
-                        continue
-                    fi
+            block_title2 "$source"
+            if [[ ! -e $source && ! -L $source ]]; then
+                block_error2 "not installed"
+            elif [[ ! -L $source ]]; then
+                block_error2 "is not a symlink"
+            else
+                current=$(readlink "$source" 2>/dev/null)
+                if [[ $current == $target ]]; then
+                    block_entry2 "-> $current"
+                else
+                    block_error2 "-> $current"
                 fi
-
-                ln -shf "$target" "$source"
-                continue
             fi
 
-            if [[ $action == remove ]]; then
-                if [[ ! -L $source ]]; then
-                    block_error "  path is not a symlink, skipping"
-                    continue
-                fi
-                if [[ $actual != $target ]]; then
-                    block_error "  path is a symlink, but it's target $actual does not match $target, skipping"
-                    continue
-                fi
+            #case "$action" in
+                #deploy)
+                    #if [[ -f $source && ! -L $source ]]; then
+                        #block_entry "  creating backup $backup ..."
+                        #if ! mv "$source" "$backup" ; then
+                            #result=1
+                            #continue
+                        #fi
+                    #fi
 
-                block_error "  removing $source ..."
-                if ! rm "$source" ; then
-                    continue
-                fi
+                    #ln -shf "$target" "$source"
+                    #continue
+                    #;;
 
-                if [[ -f $backup ]]; then
-                  block_error "  restoring original from $backup ..."
-                  mv "$backup" "$source"
-                fi
-                continue
-            fi
+                #remove)
+                    #if [[ ! -L $source ]]; then
+                        #block_error "  path is not a symlink, skipping"
+                        #continue
+                    #fi
+                    #if [[ $actual != $target ]]; then
+                        #block_error "  path is a symlink, but it's target $actual does not match $target, skipping"
+                        #continue
+                    #fi
+
+                    #block_error "  removing $source ..."
+                    #if ! rm "$source" ; then
+                        #continue
+                    #fi
+
+                    #if [[ -f $backup ]]; then
+                      #block_error "  restoring original from $backup ..."
+                      #mv "$backup" "$source"
+                    #fi
+                    #continue
+                    #;;
+            #esac
+
+            block_end2 $result
         done
 
         block_end $result
@@ -189,7 +187,7 @@ dotfiles() {
         dotfiles_symlink
     fi
 
-    #dotfiles_group bash --files linux:bash_profile bashrc
+    dotfiles_group bash --files linux:bash_profile bashrc
     #dotfiles_group zsh --files zshrc
     #dotfiles_group tmux --files tmux.conf
 
