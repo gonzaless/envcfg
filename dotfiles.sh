@@ -112,12 +112,13 @@ dotfiles() {
             esac
         done
 
-        local os=$(os_type)
         local result=0
+        local os=$(os_type)
+
         for os_file in "${files[@]}"; do
-            local target_os="${string%%:*}"
-            local file="${string#*:}"
-            if [[ -z $target_os || $target_os == $os ]]; then
+            local target_os=$([[ "$os_file" == *:* ]] && echo "${os_file%%:*}" || echo "")
+            local file="${os_file#*:}"
+            if [[ -n $target_os && $target_os != $os ]]; then
                 continue
             fi
 
