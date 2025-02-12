@@ -67,7 +67,7 @@ dotfiles() {
                     block_error "unable to install the link: path already exist and is not a link"
                     block_error "in order to continue remove it manually"
                 else
-                    block_entry "installing ..."
+                    block_entry "installing -> $dotf_dir ..."
                     ln -shf "$dotf_dir" "$dotf_lnk"
                 fi
                 ;;
