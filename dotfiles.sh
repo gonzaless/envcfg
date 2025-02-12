@@ -49,14 +49,18 @@ dotfiles() {
         local dotf_cur=""
 
         block_title "dotfiles link $dotf_lnk"
-        if [[ ! -e $dotf_lnk ]]; then
-            block_entry "not installed"
+        if [[ ! -e $dotf_lnk && ! -L $dotf_lnk ]]; then
+            block_error "not installed"
         elif [[ ! -L $dotf_lnk ]]; then
             dotf_cur="$dotf_lnk"
-            block_entry "is not a symlink"
+            block_error "is not a symlink"
         else
             dotf_cur=$(readlink "$dotf_lnk" 2>/dev/null)
-            block_entry "-> $dotf_cur"
+            if [[ $dotf_cur == $dotf_dir ]]; then
+                block_entry "-> $dotf_cur"
+            else
+                block_error "-> $dotf_cur"
+            fi
         fi
 
         case "$action" in
@@ -73,7 +77,7 @@ dotfiles() {
                 ;;
 
             remove)
-                if [[ ! -e $dotf_lnk ]]; then
+                if [[ ! -e $dotf_lnk && ! -L $dotf_lnk ]]; then
                     block_entry "nothing to do"
                 elif [[ ! -L $dotf_lnk ]]; then
                     block_error "path is not a link, skipping"

@@ -32,12 +32,10 @@ block_error() {
 }
 
 block_end() {
-    if [[ $action == "status" ]]; then
-        echo "└─"
-    elif [[ $1 ]] ; then
+    if [[ $1 == 0 ]] ; then
         echo "└─ ${clr_green}OK${clr_reset}"
     else
-        echo "└─ ${clr_red}Error${clr_reset}"
+        echo "└─ ${clr_red}ERR${clr_reset}"
     fi
 
     echo ''
