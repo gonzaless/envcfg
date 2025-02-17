@@ -1,0 +1,12 @@
+[font]
+size = 16.0
+
+[font.normal]
+family = "3270 Nerd Font Mono"
+
+[window]
+opacity = 0.95
+
+[window.dimensions]
+columns = 160
+lines = 50
