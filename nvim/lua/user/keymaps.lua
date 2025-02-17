@@ -7,8 +7,11 @@ local keymap = function(mode, lhs, rhs, opts)
 end
 
 
--- Navigation
-keymap('n', '<leader>e', ':Lex 24<CR>')
+-- Buffers
+keymap('n', '<leader>bc', '<Cmd>BufferClose<CR>')
+keymap('n', '<leader>bm', '<Cmd>BufferPick<CR>')
+keymap('n', '<leader>bp', '<Cmd>BufferPrevious<CR>')
+keymap('n', '<leader>bn', '<Cmd>BufferNext<CR>')
 
 
 -- Window Resize
@@ -16,6 +19,7 @@ keymap('n', '<C-Up>', ':resize -2<CR>')
 keymap('n', '<C-Down>', ':resize +2<CR>')
 keymap('n', '<C-Left>', ':vertical resize -2<CR>')
 keymap('n', '<C-Right>', ':vertical resize +2<CR>')
+
 
 -- Windows Navigation
 keymap('n', '<C-h>', '<C-w>h')
