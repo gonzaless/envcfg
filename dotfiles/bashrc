@@ -1,0 +1,13 @@
+###############################################################################
+# Executed for each new interactive, non-login shell
+###############################################################################
+[[ ! -f "/etc/bashrc" ]] || source "/etc/bashrc"
+
+source "${HOME}/.dotfiles/bash/env.sh"
+
+if shopt -q login_shell ; then
+    source "${HOME}/.dotfiles/bash/login.sh"
+fi
+
+[[ ! $- == *i* ]] || source "${HOME}/.dotfiles/bash/interactive.sh"
+
