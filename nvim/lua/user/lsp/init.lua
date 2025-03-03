@@ -55,62 +55,14 @@ end
 
 
 local function on_attach(client, bufnr)
-    local function keymap(mode, lhs, rhs, opts)
-        if opts == nil then
-            opts = { noremap = true, silent = true }
-        end
-        vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts)
-    end
-
-    -- Keymap
-    keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
-    keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
-    keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
-    keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
-    keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>')
-    -- keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
-    keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
-    -- keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
-    -- keymap('n', '<leader>f', '<cmd>lua vim.diagnostic.open_float()<CR>')
-    --keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev({ border = "rounded" })<CR>')
-    --keymap('n', 'gl', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics({ border = "rounded" })<CR>')
-    --keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next({ border = "rounded" })<CR>')
-    --keymap('n', "<leader>q", '<cmd>lua vim.diagnostic.setloclist()<CR>')
-    --vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
-
-
-    -- Enable completion triggered by <C-x><C-O>
-    vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-
-    -- Server capabilities spec:
-    -- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#serverCapabilities
-    --if client.server_capabilities.documentHighlightProvider then
-        --vim.api.nvim_create_augroup("lsp_document_highlight", { clear = true })
-        --vim.api.nvim_clear_autocmds { buffer = bufnr, group = "lsp_document_highlight" }
-        --vim.api.nvim_create_autocmd("CursorHold", {
-            --callback = vim.lsp.buf.document_highlight,
-            --buffer = bufnr,
-            --group = "lsp_document_highlight",
-            --desc = "Document Highlight",
-        --})
-        --vim.api.nvim_create_autocmd("CursorMoved", {
-            --callback = vim.lsp.buf.clear_references,
-            --buffer = bufnr,
-            --group = "lsp_document_highlight",
-            --desc = "Clear All the References",
-        --})
-    --end
+    -- This function is a customization point, it is invoked by Nvim's built-in client
+    -- when attaching a buffer to a language server
 end
 
-
-local cmp_capabilities = cmp_nvim_lsp ~= nil and cmp_nvim_lsp.default_capabilities() or {}
-
 local default_server_cfg = {
+    capabilities = cmp_nvim_lsp ~= nil and cmp_nvim_lsp.default_capabilities() or {},
     on_attach = on_attach,
-    capabilities = cmp_capabilities,
 }
-
 
 local function setup_server(server_name)
     local server = lspconfig[server_name]

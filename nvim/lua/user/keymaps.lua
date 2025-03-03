@@ -60,8 +60,19 @@ keymap('n', '<C-/>', [[:call nerdcommenter#Comment('n', 'toggle')<CR>]])
 
 
 -- LSP
---keymap('n', '<Leader>e', vim.diagnostic.open_float)
---keymap('n', '[d', vim.diagnostic.goto_prev)
---keymap('n', ']d', vim.diagnostic.goto_next)
---keymap('n', '<Leader>q', vim.diagnostic.setloclist)
+keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
+keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
+keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
+keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
+keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
+keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>')
+--keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
+
+keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
+--keymap('n', '<leader>f', '<cmd>lua vim.diagnostic.open_float()<CR>')
+--keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev({ border = "rounded" })<CR>')
+--keymap('n', 'gl', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics({ border = "rounded" })<CR>')
+--keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next({ border = "rounded" })<CR>')
+--keymap('n', "<leader>q", '<cmd>lua vim.diagnostic.setloclist()<CR>')
+--vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
 

@@ -44,6 +44,8 @@ return {
         },
         opts = {
             ensure_installed = {
+                'clangd',
+                'harper_ls',
                 'lua_ls',
             },
         },

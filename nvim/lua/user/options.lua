@@ -44,7 +44,8 @@ vim.opt.ignorecase = true                                 -- Ignore case when se
 
 
 -- Spellchecking
-vim.cmd("command Spell setlocal spell! spelllang=en_us")  -- Enable spell checking, vim.opt.assumed language
+vim.opt.spell = true
+vim.opt.spelllang = "en_us"
 
 
 -- Whitespace Rendering
