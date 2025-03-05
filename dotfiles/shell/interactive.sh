@@ -17,7 +17,7 @@ fi
 # Micromamba
 ###############################################################################
 if [[ -f $MAMBA_EXE ]] ; then
-    __mamba_setup="$("$MAMBA_EXE" shell hook --shell $SHELL --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
+    __mamba_setup="$("$MAMBA_EXE" shell hook --shell ${SHELL##*/} --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
     if [ $? -eq 0 ]; then
         eval "$__mamba_setup"
     else
