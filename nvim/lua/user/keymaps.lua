@@ -1,9 +1,9 @@
 -- Utils
 local keymap = function(mode, lhs, rhs, opts)
     if opts == nil then
-        opts = { noremap = true, silent = true }
+        opts = { silent = true }
     end
-    vim.api.nvim_set_keymap(mode, lhs, rhs, opts)
+    vim.keymap.set(mode, lhs, rhs, opts)
 end
 
 
@@ -60,15 +60,15 @@ keymap('n', '<C-/>', [[:call nerdcommenter#Comment('n', 'toggle')<CR>]])
 
 
 -- LSP
-keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
-keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
-keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
-keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
-keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
-keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>')
---keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
+keymap('n', 'gD', vim.lsp.buf.declaration)
+keymap('n', 'gd', vim.lsp.buf.definition)
+keymap('n', 'gi', vim.lsp.buf.implementation)
+keymap('n', 'gr', vim.lsp.buf.references)
+keymap('n', 'K', vim.lsp.buf.hover)
+keymap('n', '<C-k>', vim.lsp.buf.signature_help)
+keymap('n', '<leader>rn', vim.lsp.buf.rename)
 
-keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
+keymap('n', '<leader>ca', vim.lsp.buf.code_action)
 --keymap('n', '<leader>f', '<cmd>lua vim.diagnostic.open_float()<CR>')
 --keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev({ border = "rounded" })<CR>')
 --keymap('n', 'gl', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics({ border = "rounded" })<CR>')
