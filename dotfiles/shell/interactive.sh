@@ -14,6 +14,20 @@ fi
 
 
 ###############################################################################
+# Micromamba
+###############################################################################
+if [[ -f $MAMBA_EXE ]] ; then
+    __mamba_setup="$("$MAMBA_EXE" shell hook --shell $SHELL --root-prefix "$MAMBA_ROOT_PREFIX" 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__mamba_setup"
+    else
+        alias micromamba="$MAMBA_EXE"  # Fallback on help from micromamba activate
+    fi
+    unset __mamba_setup
+fi
+
+
+###############################################################################
 # Aliases
 ###############################################################################
 if command -v lsd &> /dev/null; then
@@ -27,4 +41,5 @@ fi
 
 alias nv=nvim
 alias mm=micromamba
+
 

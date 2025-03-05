@@ -12,4 +12,5 @@ envcfg_add_path_if_exists "$HOME/bin" prepend
 envcfg_add_path_if_exists "$HOME/.local/bin" prepend
 
 export MAMBA_ROOT_PREFIX="${HOME}/.mamba"
+export MAMBA_EXE="${HOME}/.local/bin/micromamba"
 
