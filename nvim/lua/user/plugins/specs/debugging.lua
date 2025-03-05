@@ -55,9 +55,11 @@ return {
                 },
             }
 
-            if vim.fn.executable('gdb') == 1 then
-                require('plugins.dap.c')
-            end
+            --if vim.fn.executable('gdb') == 1 then
+                -- TODO TODO TODO
+                -- See why the module is not available
+                --require('plugins.dap.c')
+            --end
 
             vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, {})
             vim.keymap.set('n', '<F2>', dap.restart, {})
