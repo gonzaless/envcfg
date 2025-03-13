@@ -43,3 +43,8 @@ alias nv=nvim
 alias mm=micromamba
 
 
+###############################################################################
+# Box specific add-ons
+###############################################################################
+[[ ! -f "${HOME}/.usr_interactive.sh" ]] || source "${HOME}/.usr_interactive.sh"
+
