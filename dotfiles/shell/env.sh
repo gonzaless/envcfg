@@ -34,3 +34,6 @@ setup_mamba_env() {
 
 setup_mamba_env
 
+# Box specific add-ons
+[[ ! -f "${HOME}/.usr_env" ]] || source "${HOME}/.usr_env"
+
