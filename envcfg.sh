@@ -864,7 +864,7 @@ nvim_version() {
 }
 
 install_nvim() {
-    if [[ $os_name == centos ]]; then
+    if [[ $os_name == centos || $os_name == rocky ]]; then
         installing_package_comment "CentOS packages are very old, installing nvim using AppImage..."
 
         if ! is_known_command curl; then
