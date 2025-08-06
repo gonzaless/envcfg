@@ -27,15 +27,17 @@ local diagnostic_cfg = {
         --prefix = '',
         --style = 'minimal',
     },
-    signs = true,
+    signs = {
+        active = true,
+        text = {
+            [vim.diagnostic.severity.ERROR] = "",
+            [vim.diagnostic.severity.WARN]  = "",
+            [vim.diagnostic.severity.INFO]  = "",
+            [vim.diagnostic.severity.HINT]  = "",
+        },
+    },
+    underline = true,
     virtual_text = true,
-}
-
-local sign_overrides = {
-    { name = "DiagnosticSignError", sign = { text = "", texthl = 'DiagnosticError', --[[culhl = '', linehl = '', numhl = ''--]] } },
-    { name = "DiagnosticSignWarn" , sign = { text = "", texthl = 'DiagnosticWarn' } },
-    { name = "DiagnosticSignHint" , sign = { text = "", texthl = 'DiagnosticHint' } },
-    { name = "DiagnosticSignInfo" , sign = { text = "", texthl = 'DiagnosticInfo' } },
 }
 
 
@@ -43,10 +45,6 @@ local sign_overrides = {
 -- Utils
 -------------------------------------------------------------------------------
 local function configure_ui()
-    for _, override in ipairs(sign_overrides) do
-        vim.fn.sign_define(override.name, override.sign)
-    end
-
     vim.diagnostic.config(diagnostic_cfg)
 
     vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = popup_border })
