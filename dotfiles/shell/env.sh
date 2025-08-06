@@ -1,6 +1,6 @@
 envcfg_add_path_if_exists() {
     if [[ -d "$1" ]] && [[ ":$PATH:" != *":$1:"* ]]; then
-        if [[ $2 == prepand ]]; then
+        if [[ $2 == prepend ]]; then
             export PATH="$1${PATH:+":$PATH"}"
         else
             export PATH="${PATH:+"$PATH:"}$1"
