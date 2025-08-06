@@ -1,6 +1,6 @@
 return {
     cmd = {
         'clangd',
-        '--query-driver=c++',
+        '--query-driver=/huron/sys/env/2/bin/*',
     }
 }
