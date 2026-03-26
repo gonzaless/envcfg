@@ -10,6 +10,7 @@ envcfg_add_path_if_exists() {
 
 envcfg_add_path_if_exists "$HOME/bin" prepend
 envcfg_add_path_if_exists "$HOME/.local/bin" prepend
+envcfg_add_path_if_exists "$HOME/.npm-global/bin"
 
 setup_mamba_env() {
     export MAMBA_ROOT_PREFIX="${HOME}/.mamba"
