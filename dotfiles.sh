@@ -2,8 +2,8 @@
 
 dotfiles() {
     local repo_root=$( cd -- "$( dirname -- "$0" )" &> /dev/null && pwd )
-    source ${repo_root}/utility/io.sh
-    source ${repo_root}/utility/os.sh
+    source "${repo_root}/utility/io.sh"
+    source "${repo_root}/utility/os.sh"
 
     dotfiles_print_help() {
         echo "Usage: ${0##*/} [-s|--status] [-d|--deploy] [-r|--remove] [-h|--help] [groups ...]"
