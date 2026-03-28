@@ -1,5 +1,3 @@
-
-
 local cmp_nvim_lsp_found, cmp_nvim_lsp = pcall(require, 'cmp_nvim_lsp')
 if not cmp_nvim_lsp_found then
     print('cmp_nvim_lsp module not found')
