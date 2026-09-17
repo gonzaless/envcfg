@@ -926,12 +926,8 @@ install_tmux() {
     install_os_package tmux
 }
 
-sync_tmux() {
-    sync_root '~' 'tmux'
-    sync_item '.tmux.conf'
-}
-
-package Tmux --min-version 3.0 --command tmux --get-version tmux_version --install install_tmux --sync sync_tmux
+# tmux.conf is managed by dotfiles.sh
+package Tmux --min-version 3.0 --command tmux --get-version tmux_version --install install_tmux
 
 
 #
@@ -1084,8 +1080,8 @@ install_zsh() {
 }
 
 sync_zsh() {
+    # .zshrc is managed by dotfiles.sh
     sync_root '~' 'zsh'
-    sync_item '.zshrc'
     sync_item '.p10k.zsh'
 }
 
