@@ -157,7 +157,7 @@ dotfiles() {
             case "$action" in
                 deploy)
                     entry_result=0
-                    if [[ -f $source && ! -L $source ]]; then
+                    if [[ -e $source && ! -L $source ]]; then
                         block_entry2 "creating backup $backup ..."
                         mv "$source" "$backup"
                         entry_result=$?
@@ -165,7 +165,7 @@ dotfiles() {
 
                     if [[ $entry_result == 0 ]]; then
                         block_entry2 "installing -> $dotf_dir ..."
-                        ln -snf "$target" "$source"
+                        mkdir -p "$(dirname "$source")" && ln -snf "$target" "$source"
                         entry_result=$?
                     fi
                     ;;
@@ -183,7 +183,7 @@ dotfiles() {
                         entry_result=$?
                     fi
 
-                    if [[ $entry_result == 0 && -f $backup ]]; then
+                    if [[ $entry_result == 0 && -e $backup ]]; then
                       block_entry2 "restoring original from $backup ..."
                       mv "$backup" "$source"
                       entry_result=$?
@@ -208,6 +208,7 @@ dotfiles() {
     dotfiles_group bash --files linux:bash_profile bashrc
     dotfiles_group zsh --files zshrc p10k.zsh
     dotfiles_group tmux --files tmux.conf
+    dotfiles_group nvim --files config/nvim
 
     if [[ $action == remove ]]; then
         dotfiles_symlink

@@ -903,13 +903,8 @@ install_nvim() {
     install_os_package neovim@brew nvim@snap neovim@aptitude
 }
 
-sync_nvim() {
-    sync_root '~/.config/nvim'
-    sync_item 'init.lua'
-    sync_item 'lua'
-}
-
-package Neovim --min-version 0.9 --command nvim --get-version nvim_version --install install_nvim --sync sync_nvim
+# ~/.config/nvim is managed by dotfiles.sh
+package Neovim --min-version 0.9 --command nvim --get-version nvim_version --install install_nvim
 
 
 #
