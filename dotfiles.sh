@@ -157,16 +157,20 @@ dotfiles() {
             case "$action" in
                 deploy)
                     entry_result=0
-                    if [[ -e $source && ! -L $source ]]; then
-                        block_entry2 "creating backup $backup ..."
-                        mv "$source" "$backup"
-                        entry_result=$?
-                    fi
+                    if [[ $current == $target ]]; then
+                        block_entry2 "nothing to do"
+                    else
+                        if [[ -e $source && ! -L $source ]]; then
+                            block_entry2 "creating backup $backup ..."
+                            mv "$source" "$backup"
+                            entry_result=$?
+                        fi
 
-                    if [[ $entry_result == 0 ]]; then
-                        block_entry2 "installing -> $dotf_dir ..."
-                        mkdir -p "$(dirname "$source")" && ln -snf "$target" "$source"
-                        entry_result=$?
+                        if [[ $entry_result == 0 ]]; then
+                            block_entry2 "installing -> $target ..."
+                            mkdir -p "$(dirname "$source")" && ln -snf "$target" "$source"
+                            entry_result=$?
+                        fi
                     fi
                     ;;
 
