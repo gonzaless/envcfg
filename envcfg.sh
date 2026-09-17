@@ -857,7 +857,7 @@ package Neofetch --command neofetch --sync sync_neofetch
 
 
 #
-# Neovim
+# Nvim
 #
 nvim_version() {
     nvim --version | head -1 | cut -c7-
@@ -904,7 +904,7 @@ install_nvim() {
 }
 
 # ~/.config/nvim is managed by dotfiles.sh
-package Neovim --min-version 0.9 --command nvim --get-version nvim_version --install install_nvim
+package Nvim --min-version 0.9 --command nvim --get-version nvim_version --install install_nvim
 
 
 #
