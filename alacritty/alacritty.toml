@@ -10,3 +10,7 @@ opacity = 0.95
 [window.dimensions]
 columns = 160
 lines = 50
+
+[keyboard]
+# Shift+Return sends ESC+Enter (same as Option+Enter) to work in tmux
+bindings = [{ key = "Return", mods = "Shift", chars = "\u001b\r" }]
