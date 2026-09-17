@@ -1079,13 +1079,8 @@ install_zsh() {
     fi
 }
 
-sync_zsh() {
-    # .zshrc is managed by dotfiles.sh
-    sync_root '~' 'zsh'
-    sync_item '.p10k.zsh'
-}
-
-package Zsh --min-version 5.1 --command zsh --get-version zsh_version --is-installed is_zsh_installed --install install_zsh --sync sync_zsh
+# .zshrc and .p10k.zsh are managed by dotfiles.sh
+package Zsh --min-version 5.1 --command zsh --get-version zsh_version --is-installed is_zsh_installed --install install_zsh
 
 
 #
