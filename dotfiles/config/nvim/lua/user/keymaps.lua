@@ -61,7 +61,16 @@ keymap('n', '<C-/>', [[:call nerdcommenter#Comment('n', 'toggle')<CR>]])
 
 -- LSP
 keymap('n', 'gD', vim.lsp.buf.declaration)
-keymap('n', 'gd', vim.lsp.buf.definition)
+keymap('n', 'gd', function()
+    -- Ask the language server when one supports it, otherwise fall back to
+    -- vim's built-in local declaration search (first match from the top of the file)
+    if #vim.lsp.get_clients({ bufnr = 0, method = 'textDocument/definition' }) > 0 then
+        vim.lsp.buf.definition()
+    else
+        vim.cmd('normal! gd')
+        vim.v.hlsearch = 0  -- jump, don't leave search highlights behind (use * for that)
+    end
+end)
 keymap('n', 'gi', vim.lsp.buf.implementation)
 keymap('n', 'gr', vim.lsp.buf.references)
 keymap('n', 'K', vim.lsp.buf.hover)
