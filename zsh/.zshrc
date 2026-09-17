@@ -9,7 +9,8 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-if [[ -f $HOME/.p10k.zsh ]]; then
+unset P10K_IS_AVAILABLE
+if [[ -f ${HOME}/.p10k.zsh ]]; then
     P10K_IS_AVAILABLE=1
 fi
 
@@ -128,55 +129,8 @@ typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION=''
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
-# Preferred editor for local and remote sessions
-if command -v nvim &> /dev/null; then
-    PREFERRED_EDITOR='nvim'
-else
-    PREFERRED_EDITOR='vim'
-fi
 
-if [[ -z $PREFERRED_EDITOR ]]; then
-    export EDITOR=$PREFERRED_EDITOR
-fi
-
-# VI Mode line editor
-bindkey -v
-
-
-###############################################################################
-# PATH
-###############################################################################
-envcfg_add_path_if_exists() {
-    if [[ -d "$1" ]] && [[ ":$PATH:" != *":$1:"* ]]; then
-        if [[ $2 == prepend ]]; then
-            PATH="$1${PATH:+":$PATH"}"
-        else
-            PATH="${PATH:+"$PATH:"}$1"
-        fi
-    fi
-}
-
-envcfg_add_path_if_exists "$HOME/bin" prepend
-envcfg_add_path_if_exists "$HOME/.local/bin" prepend
-
-
-###############################################################################
-# USER Aliases
-###############################################################################
-
-# ls aliases
-if command -v lsd &> /dev/null; then
-    alias ls='lsd'
-    alias lt='lsd --tree'
-elif command -v tree &> /dev/null; then
-    alias lt='tree'
-else
-    alias lt='find . -not -path "*/.*" | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"'
-fi
-
-
-###############################################################################
-# External Utils Integration
-###############################################################################
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source "${HOME}/.dotfiles/zsh/env.sh"
+[[ ! -o login ]] || source "${HOME}/.dotfiles/zsh/login.sh"
+[[ ! -o interactive ]] || source "${HOME}/.dotfiles/zsh/interactive.sh"
 
